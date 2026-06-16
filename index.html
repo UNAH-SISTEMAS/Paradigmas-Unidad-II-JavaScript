@@ -1,0 +1,2506 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lenguajes Multiparadigma · Ing. Ricardo Toro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #f6efdd;
+      --bg-card:      #fbf6e8;
+      --bg-card2:     #f2e9d0;
+      --accent:       #7a2418;
+      --accent-hover: #9e3020;
+      --text:         #1a1610;
+      --text-muted:   #7a6c54;
+      --sidebar-bg:   #1a1610;
+      --sidebar-text: #c8bda4;
+      --sidebar-dim:  #7a6c54;
+      --code-bg:      #1e1a14;
+      --code-text:    #e2d5bc;
+      --border:       #d4c9a8;
+      --border-soft:  #e8dcc8;
+      --kw:  #e07b6a;
+      --str: #8fbe74;
+      --cmt: #6e6352;
+      --num: #d4a04a;
+      --fn:  #7abecd;
+      --pp:  #b08fc8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: auto; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 15px;
+      line-height: 1.65;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ─────────────────────────────────────── */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 264px;
+      height: 100vh;
+      background: var(--sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-thumb { background: #3a3028; border-radius: 2px; }
+
+    .sidebar-header {
+      padding: 28px 24px 20px;
+      border-bottom: 1px solid #2e2820;
+    }
+
+    .sidebar-course {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 19px;
+      font-style: italic;
+      color: #e8dcc8;
+      line-height: 1.3;
+      margin-bottom: 6px;
+    }
+
+    .sidebar-tag {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      color: #c8bda4;
+      text-transform: uppercase;
+    }
+
+    .sidebar-section-label {
+      padding: 18px 24px 6px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      color: #a89e8a;
+      text-transform: uppercase;
+    }
+
+    .sidebar nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 24px;
+      color: var(--sidebar-text);
+      text-decoration: none;
+      font-size: 13.5px;
+      transition: background 0.15s, color 0.15s;
+      border-left: 3px solid transparent;
+    }
+
+    .sidebar nav a:hover {
+      background: #24201a;
+      color: #f0e8d4;
+      border-left-color: #4a3a28;
+    }
+
+    .sidebar nav a.active {
+      background: #2a1e18;
+      color: #f0e8d4;
+      border-left-color: var(--accent);
+    }
+
+    .sidebar nav a .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      background: #2e2820;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--sidebar-dim);
+      flex-shrink: 0;
+    }
+
+    .sidebar nav a.active .num {
+      background: var(--accent);
+      color: #fde8e0;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 20px 24px;
+      border-top: 1px solid #2e2820;
+      font-family: 'EB Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 13px;
+      color: #a89e8a;
+    }
+
+    /* ── Main content ────────────────────────────────── */
+    .main {
+      margin-left: 264px;
+      flex: 1;
+      padding: 56px 64px 120px 64px;
+      max-width: calc(100% - 264px);
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    /* ── Page header ─────────────────────────────────── */
+    .page-header {
+      margin-bottom: 56px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-header-tag {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3.5px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .page-header h1 {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 46px;
+      font-weight: 500;
+      font-style: italic;
+      color: var(--text);
+      line-height: 1.15;
+      margin-bottom: 12px;
+    }
+
+    .page-header-meta {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* ── Class section ───────────────────────────────── */
+    .class-section {
+      display: none;
+    }
+
+    .class-section.active {
+      display: block;
+      animation: fadeIn 0.22s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .class-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .class-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      width: 54px;
+      height: 54px;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fde8e0;
+      flex-shrink: 0;
+    }
+
+    .class-badge-label {
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      opacity: 0.8;
+      line-height: 1;
+    }
+
+    .class-badge-num {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 26px;
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    .class-title {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 32px;
+      font-weight: 500;
+      line-height: 1.2;
+      color: var(--text);
+    }
+
+    .class-title-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ── Section headings ────────────────────────────── */
+    .section-title {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--text);
+      margin: 32px 0 12px;
+    }
+
+    .subsection-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin: 24px 0 10px;
+    }
+
+    /* ── Objectives box ──────────────────────────────── */
+    .objectives {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      padding: 18px 22px;
+      margin-bottom: 28px;
+    }
+
+    .objectives-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .objectives ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .objectives ul li {
+      display: flex;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .objectives ul li::before {
+      content: '→';
+      color: var(--accent);
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    /* ── Prose ───────────────────────────────────────── */
+    .prose p {
+      margin-bottom: 14px;
+      color: var(--text);
+    }
+
+    .prose strong { color: var(--text); font-weight: 600; }
+
+    .prose ul, .prose ol {
+      padding-left: 22px;
+      margin-bottom: 14px;
+    }
+
+    .prose ul li, .prose ol li {
+      margin-bottom: 5px;
+    }
+
+    /* ── Code blocks ─────────────────────────────────── */
+    .code-block {
+      background: var(--code-bg);
+      border-radius: 10px;
+      margin: 18px 0;
+      overflow: hidden;
+    }
+
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background: #141210;
+      border-bottom: 1px solid #2a2520;
+    }
+
+    .code-block-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+    .code-block-dot:nth-child(1) { background: #6e4040; }
+    .code-block-dot:nth-child(2) { background: #6e6240; }
+    .code-block-dot:nth-child(3) { background: #3e5e3e; }
+
+    .code-block-lang {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: #4a4038;
+      text-transform: uppercase;
+    }
+
+    .code-block pre {
+      padding: 20px 22px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: var(--code-text);
+    }
+
+    .code-block pre::-webkit-scrollbar { height: 4px; }
+    .code-block pre::-webkit-scrollbar-thumb { background: #3a3028; border-radius: 2px; }
+
+    /* syntax colors */
+    .kw  { color: var(--kw);  }
+    .str { color: var(--str); }
+    .cmt { color: var(--cmt); font-style: italic; }
+    .num { color: var(--num); }
+    .fn  { color: var(--fn);  }
+    .pp  { color: var(--pp);  }
+
+    /* ── Inline code ─────────────────────────────────── */
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      background: var(--bg-card2);
+      color: var(--accent);
+      padding: 1px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    /* ── Tables ──────────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 18px 0;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+
+    thead tr {
+      background: var(--bg-card2);
+    }
+
+    th {
+      text-align: left;
+      padding: 10px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 10px 16px;
+      color: var(--text);
+      border-bottom: 1px solid var(--border-soft);
+      vertical-align: top;
+    }
+
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:nth-child(even) { background: var(--bg-card); }
+
+    td code, th code { font-size: 12px; }
+
+    /* ── Info / warning cards ────────────────────────── */
+    .callout {
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 18px 0;
+      font-size: 14px;
+    }
+
+    .callout-warn {
+      background: #fbf0e8;
+      border: 1px solid #d4a87a;
+      border-left: 4px solid #c47a2a;
+    }
+
+    .callout-info {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--text-muted);
+    }
+
+    .callout-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      color: #c47a2a;
+    }
+
+    .callout-info .callout-label { color: var(--text-muted); }
+
+    /* ── Activity box ────────────────────────────────── */
+    .activity {
+      background: #fbf6e8;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 22px 26px;
+      margin-top: 28px;
+    }
+
+    .activity-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .activity h4 {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 17px;
+      font-weight: 500;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    /* ── Diagram / flow box ──────────────────────────── */
+    .flow-box {
+      background: var(--code-bg);
+      border-radius: 8px;
+      padding: 18px 24px;
+      margin: 16px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #b0a898;
+      line-height: 1.8;
+      white-space: pre;
+    }
+
+    .divider { display: none; }
+
+    /* ── Bottom navigation bar ───────────────────────── */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 264px;
+      right: 0;
+      height: 62px;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 64px;
+      z-index: 50;
+    }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.14s, border-color 0.14s;
+    }
+
+    .nav-btn:hover {
+      background: var(--bg-card2);
+      border-color: var(--text-muted);
+    }
+
+    .nav-btn.next {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fde8e0;
+    }
+
+    .nav-btn.next:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.28;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    .page-counter {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.5px;
+    }
+
+    .page-counter strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* ── Collapsible sidebar groups ─────────────────── */
+    .sidebar-group {}
+
+    .sidebar-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 24px 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .sidebar-group-header:hover .sidebar-section-label { color: #c8bda4; }
+
+    .sidebar-group-header .sidebar-section-label {
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar-toggle {
+      color: #a89e8a;
+      font-size: 10px;
+      transition: transform 0.25s ease;
+      flex-shrink: 0;
+    }
+
+    .sidebar-group.collapsed .sidebar-toggle {
+      transform: rotate(-90deg);
+    }
+
+    .sidebar-group-nav {
+      overflow: hidden;
+      max-height: 600px;
+      transition: max-height 0.3s ease;
+    }
+
+    .sidebar-group.collapsed .sidebar-group-nav {
+      max-height: 0;
+    }
+
+    /* ── Demo exercises ──────────────────────────────── */
+    .exercise-demo {
+      background: #eef6fb;
+      border: 1px solid #b0cfe8;
+      border-left: 4px solid #3a82c4;
+      border-radius: 10px;
+      padding: 22px 26px;
+      margin-top: 32px;
+    }
+
+    .exercise-demo-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #3a82c4;
+      margin-bottom: 14px;
+    }
+
+    .exercise-demo h4 {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 17px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .exercise-demo p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    /* ── Homework area ───────────────────────────────── */
+    .homework {
+      background: #fdf8ec;
+      border: 1px solid #e8d070;
+      border-left: 4px solid #c49a18;
+      border-radius: 10px;
+      padding: 22px 26px;
+      margin-top: 32px;
+    }
+
+    .homework-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #c49a18;
+      margin-bottom: 6px;
+    }
+
+    .homework > p.hw-intro {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+
+    .hw-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 10px;
+    }
+
+    .hw-item-num {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .hw-item p {
+      font-size: 14px;
+      color: var(--text);
+      margin: 0;
+      line-height: 1.55;
+    }
+
+    /* ── Responsive ──────────────────────────────────── */
+    @media (max-width: 900px) {
+      .sidebar { width: 220px; }
+      .main { margin-left: 220px; max-width: calc(100% - 220px); padding: 36px 32px 100px; }
+      .bottom-nav { left: 220px; padding: 0 32px; }
+    }
+
+    @media (max-width: 640px) {
+      .sidebar { transform: translateX(-100%); }
+      .main { margin-left: 0; max-width: 100%; padding: 28px 20px 100px; }
+      .bottom-nav { left: 0; padding: 0 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     SIDEBAR
+════════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-course">Lenguajes Multiparadigma</div>
+    <div class="sidebar-tag">Python · JS · PHP · Unidad II</div>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-header">
+      <div class="sidebar-section-label">Conceptos</div>
+      <span class="sidebar-toggle">▼</span>
+    </div>
+    <div class="sidebar-group-nav">
+      <nav>
+        <a href="#clase1" class="active">
+          <span class="num">1</span> ¿Qué es un Paradigma?
+        </a>
+        <a href="#clase2">
+          <span class="num">2</span> El Concepto Multiparadigma
+        </a>
+        <a href="#clase3">
+          <span class="num">3</span> CLI vs Web
+        </a>
+      </nav>
+    </div>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-header">
+      <div class="sidebar-section-label">Los Lenguajes</div>
+      <span class="sidebar-toggle">▼</span>
+    </div>
+    <div class="sidebar-group-nav">
+      <nav>
+        <a href="#clase4">
+          <span class="num">4</span> Python
+        </a>
+        <a href="#clase5">
+          <span class="num">5</span> JavaScript
+        </a>
+        <a href="#clase6">
+          <span class="num">6</span> PHP
+        </a>
+      </nav>
+    </div>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-header">
+      <div class="sidebar-section-label">Análisis</div>
+      <span class="sidebar-toggle">▼</span>
+    </div>
+    <div class="sidebar-group-nav">
+      <nav>
+        <a href="#clase7">
+          <span class="num">7</span> Comparativa de los Tres
+        </a>
+        <a href="#clase8">
+          <span class="num">8</span> Beneficios del Multiparadigma
+        </a>
+      </nav>
+    </div>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-header">
+      <div class="sidebar-section-label">JavaScript Básico</div>
+      <span class="sidebar-toggle">▼</span>
+    </div>
+    <div class="sidebar-group-nav">
+      <nav>
+        <a href="#clase9">
+          <span class="num">9</span> Introducción a JavaScript
+        </a>
+      </nav>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">Ing. Ricardo Toro &nbsp;·&nbsp; 2026</div>
+</aside>
+
+<!-- ════════════════════════════════════════
+     MAIN CONTENT
+════════════════════════════════════════ -->
+<main class="main">
+
+  <div class="page-header">
+    <div class="page-header-tag">Paradigmas de Programación · Unidad II</div>
+    <h1>Introducción a los Lenguajes Multiparadigma</h1>
+    <div class="page-header-meta">Ing. Ricardo Toro &nbsp;·&nbsp; UNAH · 2026</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       CLASE 1
+  ═══════════════════════════════════════ -->
+  <section class="class-section" id="clase1">
+    <div class="class-header">
+      <div class="class-badge">
+        <span class="class-badge-label">Clase</span>
+        <span class="class-badge-num">1</span>
+      </div>
+      <div>
+        <div class="class-title">¿Qué es un Paradigma de Programación?</div>
+        <div class="class-title-sub">Definición · Historia · Tipos fundamentales</div>
+      </div>
+    </div>
+
+    <div class="objectives">
+      <div class="objectives-label">Objetivos</div>
+      <ul>
+        <li>Comprender qué es un paradigma y por qué existe en la programación.</li>
+        <li>Identificar los principales paradigmas y sus características.</li>
+        <li>Reconocer qué paradigma usa el código que ya conocemos.</li>
+      </ul>
+    </div>
+
+    <div class="section-title">¿Qué es un Paradigma?</div>
+    <div class="prose">
+      <p>La palabra <strong>paradigma</strong> proviene del griego <em>paradeigma</em>, que significa "modelo" o "ejemplo". En ciencias, un paradigma es un <strong>conjunto de supuestos, conceptos, valores y prácticas</strong> que constituyen una forma de ver la realidad y de resolver problemas dentro de una disciplina.</p>
+      <p>En programación, un <strong>paradigma de programación</strong> es un <strong>estilo o enfoque fundamental</strong> para estructurar y pensar el código. Define cómo el programador concibe la solución: si el programa es una secuencia de instrucciones, un conjunto de objetos que interactúan, una serie de funciones matemáticas, o una colección de reglas lógicas.</p>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-label">Analogía</div>
+      Piensa en un paradigma como una <strong>filosofía de diseño</strong>: del mismo modo que un arquitecto puede diseñar un edificio con filosofía minimalista, barroca o funcionalista, un programador puede resolver el mismo problema con paradigma imperativo, funcional u orientado a objetos.
+    </div>
+
+    <div class="section-title">Historia de los Paradigmas</div>
+    <div class="prose">
+      <p>Los paradigmas emergieron a medida que los lenguajes de programación evolucionaron y los problemas a resolver se volvieron más complejos:</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Década</th><th>Hito</th><th>Paradigma asociado</th></tr></thead>
+        <tbody>
+          <tr><td>1950s</td><td>Fortran, ensamblador</td><td>Imperativo / Procedimental</td></tr>
+          <tr><td>1960s</td><td>LISP, Simula 67</td><td>Funcional / Orientado a Objetos (proto)</td></tr>
+          <tr><td>1970s</td><td>C, Pascal, Prolog</td><td>Procedimental / Lógico</td></tr>
+          <tr><td>1980s</td><td>C++, Smalltalk, Ada</td><td>Orientado a Objetos consolidado</td></tr>
+          <tr><td>1990s</td><td>Python, Java, Ruby, Haskell</td><td>Multiparadigma / Funcional puro</td></tr>
+          <tr><td>2000s-hoy</td><td>JavaScript, Scala, Kotlin, PHP</td><td>Multiparadigma dominante</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title">Principales Paradigmas de Programación</div>
+
+    <div class="subsection-title">1. Paradigma Imperativo</div>
+    <div class="prose">
+      <p>El programa describe <strong>cómo</strong> realizar la tarea: una secuencia explícita de instrucciones que cambian el estado del programa. Es el paradigma más cercano al funcionamiento físico de la computadora.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">Python — Estilo imperativo</span>
+      </div>
+      <pre><span class="cmt"># Calcular la suma de una lista de forma imperativa</span>
+numeros = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>]
+suma = <span class="num">0</span>
+<span class="kw">for</span> n <span class="kw">in</span> numeros:
+    suma += n          <span class="cmt"># instrucción explícita que modifica estado</span>
+<span class="fn">print</span>(suma)            <span class="cmt"># → 15</span></pre>
+    </div>
+
+    <div class="subsection-title">2. Paradigma Procedimental</div>
+    <div class="prose">
+      <p>Extensión del imperativo que organiza el código en <strong>procedimientos o funciones</strong> reutilizables. El flujo del programa sigue una secuencia de llamadas a dichos procedimientos.</p>
+    </div>
+
+    <div class="subsection-title">3. Paradigma Orientado a Objetos (POO)</div>
+    <div class="prose">
+      <p>Organiza el código en torno a <strong>objetos</strong> que combinan datos (atributos) y comportamiento (métodos). Los objetos interactúan entre sí mediante mensajes (llamadas a métodos).</p>
+      <p>Conceptos clave: <strong>Clases, Herencia, Encapsulamiento, Polimorfismo.</strong></p>
+    </div>
+
+    <div class="subsection-title">4. Paradigma Funcional</div>
+    <div class="prose">
+      <p>El programa se construye aplicando y componiendo <strong>funciones puras</strong>. Se evita el estado mutable y los efectos secundarios. Las funciones son tratadas como valores de primera clase (se pueden pasar como argumentos).</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">Python — Estilo funcional</span>
+      </div>
+      <pre><span class="cmt"># La misma suma, con estilo funcional</span>
+numeros = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>]
+resultado = <span class="fn">sum</span>(numeros)     <span class="cmt"># función pura, sin mutación de estado</span>
+<span class="fn">print</span>(resultado)              <span class="cmt"># → 15</span>
+
+<span class="cmt"># Usando reduce (funcional puro)</span>
+<span class="kw">from</span> functools <span class="kw">import</span> reduce
+resultado = <span class="fn">reduce</span>(<span class="kw">lambda</span> a, b: a + b, numeros)
+<span class="fn">print</span>(resultado)              <span class="cmt"># → 15</span></pre>
+    </div>
+
+    <div class="subsection-title">5. Paradigma Lógico</div>
+    <div class="prose">
+      <p>El programa describe <strong>qué</strong> debe ser verdadero, y el motor de inferencia determina cómo resolverlo. Representado principalmente por Prolog. No se especifica el flujo de control.</p>
+    </div>
+
+    <div class="subsection-title">6. Paradigma Basado en Eventos</div>
+    <div class="prose">
+      <p>El flujo del programa es controlado por <strong>eventos</strong> externos: clics del usuario, respuestas de red, temporizadores. Es la base del desarrollo de interfaces gráficas y aplicaciones web interactivas.</p>
+    </div>
+
+    <div class="section-title">Resumen — Mapa de Paradigmas</div>
+    <div class="flow-box">  PARADIGMAS DE PROGRAMACIÓN
+  ────────────────────────────────────────────
+  Imperativo ─┬─ Procedimental   (C, Pascal)
+              └─ Orientado a     (Java, C++, Python, PHP)
+                 Objetos (POO)
+
+  Declarativo ─┬─ Funcional      (Haskell, Erlang, Python, JS)
+               └─ Lógico         (Prolog)
+
+  Basado en eventos               (JavaScript, PHP/web)
+
+  Multiparadigma ── combina varios de los anteriores
+                    (Python, JavaScript, PHP, Ruby, Kotlin)</div>
+
+    <div class="activity">
+      <div class="activity-label">Reflexión inicial</div>
+      <h4>Analiza el siguiente fragmento e identifica a qué paradigma pertenece:</h4>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+          <span class="code-block-lang">¿Qué paradigma es este?</span>
+        </div>
+        <pre>cuadrados = [x**<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> range(<span class="num">10</span>) <span class="kw">if</span> x % <span class="num">2</span> == <span class="num">0</span>]</pre>
+      </div>
+      <p style="font-size:14px; color:var(--text); margin-top:12px;">¿Cómo cambiarías este código si lo escribieras en estilo imperativo clásico?</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════
+       CLASE 2
+  ═══════════════════════════════════════ -->
+  <section class="class-section" id="clase2">
+    <div class="class-header">
+      <div class="class-badge">
+        <span class="class-badge-label">Clase</span>
+        <span class="class-badge-num">2</span>
+      </div>
+      <div>
+        <div class="class-title">El Concepto Multiparadigma</div>
+        <div class="class-title-sub">Definición · Por qué surgió · Ventajas · Tensiones</div>
+      </div>
+    </div>
+
+    <div class="objectives">
+      <div class="objectives-label">Objetivos</div>
+      <ul>
+        <li>Definir con precisión qué es un lenguaje multiparadigma.</li>
+        <li>Comprender por qué los lenguajes modernos adoptaron este enfoque.</li>
+        <li>Identificar las ventajas y los desafíos del multiparadigma.</li>
+      </ul>
+    </div>
+
+    <div class="section-title">¿Qué es un Lenguaje Multiparadigma?</div>
+    <div class="prose">
+      <p>Un <strong>lenguaje multiparadigma</strong> es aquel que soporta de forma nativa más de un estilo o paradigma de programación, permitiendo al desarrollador <strong>elegir el enfoque más adecuado</strong> para cada problema, o incluso combinar varios enfoques dentro del mismo programa.</p>
+      <p>No significa que el lenguaje "mezcle" los paradigmas arbitrariamente, sino que <strong>ofrece las herramientas necesarias</strong> para programar bajo distintos estilos: puede tener clases (POO), funciones de primera clase y lambdas (funcional), estructuras de control clásicas (imperativo), y soporte para eventos.</p>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-label">Definición clave</div>
+      Un lenguaje multiparadigma no impone un único estilo de pensamiento. Le da al programador la libertad — y la responsabilidad — de <strong>elegir el paradigma correcto para cada situación</strong>.
+    </div>
+
+    <div class="section-title">¿Por Qué Surgió el Multiparadigma?</div>
+    <div class="prose">
+      <p>Los paradigmas puros, aunque elegantes en teoría, presentan limitaciones prácticas:</p>
+      <ul>
+        <li>La <strong>POO pura</strong> puede volverse rígida y burocrática para tareas simples de transformación de datos.</li>
+        <li>El <strong>funcional puro</strong> (como Haskell) tiene una curva de aprendizaje muy alta y puede ser poco intuitivo para modelar entidades del mundo real.</li>
+        <li>El <strong>imperativo puro</strong> escala mal en sistemas concurrentes y distribuidos modernos.</li>
+      </ul>
+      <p>Los problemas reales rara vez encajan en una sola caja. Un sistema web necesita modelar entidades (POO), transformar datos eficientemente (funcional), reaccionar a eventos del usuario (eventos) y ejecutar lógica secuencial (imperativo). El multiparadigma nació de la <strong>necesidad pragmática</strong>.</p>
+    </div>
+
+    <div class="section-title">Mismo Problema, Tres Enfoques</div>
+    <div class="prose"><p>Filtrar los números pares de una lista y duplicarlos:</p></div>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">Python — Imperativo</span>
+      </div>
+      <pre>numeros = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>]
+resultado = []
+<span class="kw">for</span> n <span class="kw">in</span> numeros:
+    <span class="kw">if</span> n % <span class="num">2</span> == <span class="num">0</span>:
+        resultado.append(n * <span class="num">2</span>)
+<span class="fn">print</span>(resultado)   <span class="cmt"># → [4, 8, 12]</span></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">Python — Funcional</span>
+      </div>
+      <pre>numeros = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>]
+resultado = <span class="fn">list</span>(<span class="fn">map</span>(<span class="kw">lambda</span> x: x * <span class="num">2</span>, <span class="fn">filter</span>(<span class="kw">lambda</span> x: x % <span class="num">2</span> == <span class="num">0</span>, numeros)))
+<span class="fn">print</span>(resultado)   <span class="cmt"># → [4, 8, 12]</span></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">Python — Comprensión de listas (híbrido)</span>
+      </div>
+      <pre>numeros = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>]
+resultado = [n * <span class="num">2</span> <span class="kw">for</span> n <span class="kw">in</span> numeros <span class="kw">if</span> n % <span class="num">2</span> == <span class="num">0</span>]
+<span class="fn">print</span>(resultado)   <span class="cmt"># → [4, 8, 12]</span></pre>
+    </div>
+
+    <div class="callout callout-warn">
+      <div class="callout-label">Observación</div>
+      Los tres fragmentos producen exactamente el mismo resultado. El multiparadigma no cambia <strong>qué</strong> hace el programa, sino <strong>cómo</strong> el programador lo expresa y lo estructura.
+    </div>
+
+    <div class="section-title">Paradigmas que soportan Python, JS y PHP</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Paradigma</th><th>Python</th><th>JavaScript</th><th>PHP</th></tr></thead>
+        <tbody>
+          <tr><td>Imperativo / Procedimental</td><td>Sí</td><td>Sí</td><td>Sí</td></tr>
+          <tr><td>Orientado a Objetos (POO)</td><td>Sí</td><td>Sí (prototipal + clases ES6)</td><td>Sí</td></tr>
+          <tr><td>Funcional</td><td>Sí</td><td>Sí (fuerte)</td><td>Parcial</td></tr>
+          <tr><td>Basado en Eventos</td><td>Parcial (asyncio)</td><td>Sí (nativo)</td><td>Sí (web)</td></tr>
+          <tr><td>Reactivo</td><td>Librerías externas</td><td>Sí (RxJS, Promises)</td><td>Librerías externas</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title">Tensiones del Multiparadigma</div>
+    <div class="prose">
+      <p>El multiparadigma también conlleva <strong>desafíos</strong>:</p>
+      <ul>
+        <li><strong>Consistencia de estilo:</strong> en un equipo, cada desarrollador puede preferir un paradigma distinto, generando código inconsistente.</li>
+        <li><strong>Curva de aprendizaje:</strong> el estudiante debe dominar varios estilos, no solo uno.</li>
+        <li><strong>Abuso de flexibilidad:</strong> mezclar paradigmas sin criterio puede producir código difícil de mantener.</li>
+      </ul>
+      <p>Por eso, muchos equipos adoptan <strong>guías de estilo</strong> (como PEP 8 para Python) que establecen cuándo y cómo usar cada paradigma.</p>
+    </div>
+
+    <div class="activity">
+      <div class="activity-label">Discusión en clase</div>
+      <h4>¿Cuándo elegirías cada paradigma?</h4>
+      <div class="table-wrap" style="margin-top:12px;">
+        <table>
+          <thead><tr><th>Situación</th><th>¿Qué paradigma usarías?</th></tr></thead>
+          <tbody>
+            <tr><td>Procesar una lista de facturas y calcular totales</td><td>?</td></tr>
+            <tr><td>Modelar un sistema bancario con cuentas y clientes</td><td>?</td></tr>
+            <tr><td>Reaccionar al clic de un botón en una página web</td><td>?</td></tr>
+            <tr><td>Transformar y filtrar datos de una API en tiempo real</td><td>?</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════
+       CLASE 3
+  ═══════════════════════════════════════ -->
+  <section class="class-section" id="clase3">
+    <div class="class-header">
+      <div class="class-badge">
+        <span class="class-badge-label">Clase</span>
+        <span class="class-badge-num">3</span>
+      </div>
+      <div>
+        <div class="class-title">Entornos CLI y Web</div>
+        <div class="class-title-sub">Interfaz de línea de comandos · Desarrollo web · Dónde viven los lenguajes</div>
+      </div>
+    </div>
+
+    <div class="objectives">
+      <div class="objectives-label">Objetivos</div>
+      <ul>
+        <li>Distinguir entre el entorno CLI y el entorno Web.</li>
+        <li>Comprender cómo Python, JavaScript y PHP operan en cada entorno.</li>
+        <li>Reconocer el flujo de ejecución en aplicaciones web vs. de consola.</li>
+      </ul>
+    </div>
+
+    <div class="section-title">¿Qué es la CLI?</div>
+    <div class="prose">
+      <p><strong>CLI</strong> (Command Line Interface) es una interfaz de texto donde el usuario interactúa con el sistema escribiendo comandos en una terminal o consola. No hay botones, imágenes ni ventanas: solo texto de entrada y texto de salida.</p>
+      <p>Los programas CLI son ideales para automatización, scripts de administración, procesamiento de datos, y como herramienta de aprendizaje porque permiten ver exactamente qué hace el código sin capas de abstracción visual.</p>
+    </div>
+
+    <div class="flow-box">  FLUJO EN CLI
+  ──────────────────────────────────────
+  Usuario escribe comando en terminal
+          ↓
+  Sistema operativo ejecuta el programa
+          ↓
+  Programa lee entrada (stdin / argumentos)
+          ↓
+  Programa procesa y genera resultado
+          ↓
+  Resultado se muestra en consola (stdout)
+          ↓
+  Programa termina (exit code 0 = éxito)</div>
+
+    <div class="section-title">¿Qué es el Desarrollo Web?</div>
+    <div class="prose">
+      <p>El desarrollo web consiste en crear aplicaciones que se ejecutan sobre el protocolo HTTP/HTTPS, con un <strong>cliente</strong> (navegador) y un <strong>servidor</strong>. Existen dos grandes áreas:</p>
+      <ul>
+        <li><strong>Frontend:</strong> código que corre en el navegador del usuario. Controla la interfaz visual (HTML, CSS, JavaScript).</li>
+        <li><strong>Backend:</strong> código que corre en el servidor. Gestiona la lógica de negocio, base de datos, autenticación (Python, PHP, JavaScript/Node.js).</li>
+      </ul>
+    </div>
+
+    <div class="flow-box">  FLUJO WEB (HTTP Request-Response)
+  ──────────────────────────────────────────────────
+  Navegador escribe URL y presiona Enter
+          ↓
+  Navegador envía HTTP Request al servidor
+          ↓
+  Servidor recibe la petición
+          ↓
+  Código backend (Python/PHP/JS) procesa la solicitud
+          ↓
+  Backend consulta base de datos (si es necesario)
+          ↓
+  Backend genera respuesta HTML / JSON / XML
+          ↓
+  Servidor envía HTTP Response al navegador
+          ↓
+  Navegador renderiza la página o procesa el JSON</div>
+
+    <div class="section-title">¿Dónde vive cada lenguaje?</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Lenguaje</th><th>CLI</th><th>Backend Web</th><th>Frontend Web</th><th>Herramienta/Entorno</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Python</strong></td><td>Nativo</td><td>Sí (Flask, Django, FastAPI)</td><td>No (nativo)</td><td>Intérprete CPython, pip</td></tr>
+          <tr><td><strong>JavaScript</strong></td><td>Sí (Node.js)</td><td>Sí (Express, Next.js)</td><td>Nativo en el navegador</td><td>Node.js, npm/yarn, navegador</td></tr>
+          <tr><td><strong>PHP</strong></td><td>Sí (php-cli)</td><td>Nativo (diseñado para ello)</td><td>No (nativo)</td><td>Servidor web (Apache/Nginx), Composer</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subsection-title">Python en CLI — Ejemplo</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">Python — Script CLI</span>
+      </div>
+      <pre><span class="cmt"># saludo.py — ejecutar con: python saludo.py</span>
+<span class="kw">import</span> sys
+
+<span class="kw">def</span> <span class="fn">saludar</span>(nombre):
+    <span class="fn">print</span>(<span class="str">f"Hola, {nombre}! Bienvenido a Python CLI."</span>)
+
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    nombre = sys.argv[<span class="num">1</span>] <span class="kw">if</span> <span class="fn">len</span>(sys.argv) > <span class="num">1</span> <span class="kw">else</span> <span class="str">"Estudiante"</span>
+    <span class="fn">saludar</span>(nombre)</pre>
+    </div>
+
+    <div class="subsection-title">JavaScript en el Navegador — Ejemplo</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Frontend / Evento de clic</span>
+      </div>
+      <pre><span class="cmt">// Reacciona a un evento del usuario en el navegador</span>
+<span class="kw">const</span> boton = document.<span class="fn">getElementById</span>(<span class="str">'miBoton'</span>);
+
+boton.<span class="fn">addEventListener</span>(<span class="str">'click'</span>, <span class="kw">function</span>() {
+    <span class="kw">const</span> nombre = document.<span class="fn">getElementById</span>(<span class="str">'nombre'</span>).value;
+    document.<span class="fn">getElementById</span>(<span class="str">'salida'</span>).textContent = <span class="str">`Hola, ${nombre}!`</span>;
+});</pre>
+    </div>
+
+    <div class="subsection-title">PHP en el Servidor — Ejemplo</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">PHP — Backend Web</span>
+      </div>
+      <pre><span class="cmt">&lt;?php</span>
+<span class="cmt">// El servidor ejecuta esto antes de enviar la página al navegador</span>
+<span class="kw">$nombre</span> = <span class="fn">isset</span>(<span class="kw">$_GET</span>[<span class="str">'nombre'</span>]) ? <span class="fn">htmlspecialchars</span>(<span class="kw">$_GET</span>[<span class="str">'nombre'</span>]) : <span class="str">'Estudiante'</span>;
+<span class="kw">echo</span> <span class="str">"&lt;h1&gt;Hola, $nombre!&lt;/h1&gt;"</span>;
+<span class="cmt">?&gt;</span>
+<span class="cmt">&lt;!-- URL: pagina.php?nombre=Ricardo  →  Hola, Ricardo! --&gt;</span></pre>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-label">Clave de la Unidad</div>
+      Un lenguaje multiparadigma moderno no solo mezcla estilos de programación: también puede <strong>ejecutarse en múltiples entornos</strong>. JavaScript, por ejemplo, usa exactamente el mismo lenguaje en el servidor (Node.js) y en el navegador — esto es una ventaja enorme en el desarrollo web moderno.
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════
+       CLASE 4
+  ═══════════════════════════════════════ -->
+  <section class="class-section" id="clase4">
+    <div class="class-header">
+      <div class="class-badge">
+        <span class="class-badge-label">Clase</span>
+        <span class="class-badge-num">4</span>
+      </div>
+      <div>
+        <div class="class-title">Python — Lenguaje Multiparadigma</div>
+        <div class="class-title-sub">Historia · Filosofía · POO · Funcional · Imperativo</div>
+      </div>
+    </div>
+
+    <div class="objectives">
+      <div class="objectives-label">Objetivos</div>
+      <ul>
+        <li>Conocer el origen y la filosofía de diseño de Python.</li>
+        <li>Identificar los paradigmas que Python soporta con ejemplos concretos.</li>
+        <li>Escribir código Python en distintos estilos.</li>
+      </ul>
+    </div>
+
+    <div class="section-title">Historia y Filosofía</div>
+    <div class="prose">
+      <p>Creado por <strong>Guido van Rossum</strong> y publicado en 1991. El nombre proviene del grupo de comedia británico <em>Monty Python</em>. Su filosofía se resume en el documento <strong>PEP 20 — El Zen de Python</strong>:</p>
+    </div>
+    <div class="flow-box">  El Zen de Python (fragmento) — Tim Peters
+  ──────────────────────────────────────────
+  Hermoso es mejor que feo.
+  Explícito es mejor que implícito.
+  Simple es mejor que complejo.
+  La legibilidad cuenta.
+  Debería haber una — y preferiblemente solo una —
+  manera obvia de hacerlo.</div>
+
+    <div class="section-title">Características Principales</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Característica</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td>Tipado dinámico</td><td>El tipo de una variable se determina en tiempo de ejecución.</td></tr>
+          <tr><td>Interpretado</td><td>No requiere compilación previa; el intérprete ejecuta línea a línea.</td></tr>
+          <tr><td>Sangría significativa</td><td>Los bloques de código se definen por indentación, no por llaves.</td></tr>
+          <tr><td>Baterías incluidas</td><td>Biblioteca estándar muy amplia (math, os, json, http, etc.).</td></tr>
+          <tr><td>Multiparadigma</td><td>POO, funcional, imperativo y procedimental en el mismo lenguaje.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title">Python — Paradigma Orientado a Objetos</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">Python — POO</span>
+      </div>
+      <pre><span class="kw">class</span> <span class="fn">Animal</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, nombre, sonido):
+        self.nombre = nombre      <span class="cmt"># atributo de instancia</span>
+        self.sonido = sonido
+
+    <span class="kw">def</span> <span class="fn">hablar</span>(self):             <span class="cmt"># método</span>
+        <span class="fn">print</span>(<span class="str">f"{self.nombre} dice: {self.sonido}"</span>)
+
+<span class="kw">class</span> <span class="fn">Perro</span>(<span class="fn">Animal</span>):             <span class="cmt"># herencia</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, nombre):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(nombre, <span class="str">"Guau"</span>)
+
+    <span class="kw">def</span> <span class="fn">buscar</span>(self, objeto):     <span class="cmt"># método propio</span>
+        <span class="fn">print</span>(<span class="str">f"{self.nombre} busca el {objeto}!"</span>)
+
+rex = <span class="fn">Perro</span>(<span class="str">"Rex"</span>)
+rex.<span class="fn">hablar</span>()       <span class="cmt"># → Rex dice: Guau</span>
+rex.<span class="fn">buscar</span>(<span class="str">"palo"</span>) <span class="cmt"># → Rex busca el palo!</span></pre>
+    </div>
+
+    <div class="section-title">Python — Paradigma Funcional</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">Python — Funciones de primera clase y lambdas</span>
+      </div>
+      <pre><span class="cmt"># Las funciones son objetos — se pueden pasar como argumentos</span>
+<span class="kw">def</span> <span class="fn">aplicar</span>(func, lista):
+    <span class="kw">return</span> [<span class="fn">func</span>(x) <span class="kw">for</span> x <span class="kw">in</span> lista]
+
+cuadrado = <span class="kw">lambda</span> x: x ** <span class="num">2</span>
+doble    = <span class="kw">lambda</span> x: x * <span class="num">2</span>
+
+numeros = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>]
+<span class="fn">print</span>(<span class="fn">aplicar</span>(cuadrado, numeros))  <span class="cmt"># → [1, 4, 9, 16, 25]</span>
+<span class="fn">print</span>(<span class="fn">aplicar</span>(doble,    numeros))  <span class="cmt"># → [2, 4, 6, 8, 10]</span>
+
+<span class="cmt"># map, filter, reduce — herramientas funcionales clásicas</span>
+pares = <span class="fn">list</span>(<span class="fn">filter</span>(<span class="kw">lambda</span> x: x % <span class="num">2</span> == <span class="num">0</span>, numeros))
+<span class="fn">print</span>(pares)   <span class="cmt"># → [2, 4]</span></pre>
+    </div>
+
+    <div class="section-title">Python — Hola Mundo y primeros pasos</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">Python</span>
+      </div>
+      <pre><span class="cmt"># Python 3 — el programa más simple posible</span>
+<span class="fn">print</span>(<span class="str">"Hola Mundo"</span>)
+
+<span class="cmt"># Variables: tipado dinámico — no se declara el tipo</span>
+nombre = <span class="str">"Ricardo"</span>     <span class="cmt"># str</span>
+edad   = <span class="num">30</span>            <span class="cmt"># int</span>
+altura = <span class="num">1.75</span>          <span class="cmt"># float</span>
+activo = <span class="kw">True</span>          <span class="cmt"># bool</span>
+
+<span class="fn">print</span>(<span class="str">f"Nombre: {nombre}, Edad: {edad}"</span>)
+<span class="fn">print</span>(<span class="fn">type</span>(nombre))    <span class="cmt"># → &lt;class 'str'&gt;</span></pre>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-label">Ejecutar Python</div>
+      En la terminal: <code>python archivo.py</code> o <code>python3 archivo.py</code>. Para modo interactivo: simplemente escribe <code>python</code> y presiona Enter. Escribe <code>exit()</code> para salir.
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════
+       CLASE 5
+  ═══════════════════════════════════════ -->
+  <section class="class-section" id="clase5">
+    <div class="class-header">
+      <div class="class-badge">
+        <span class="class-badge-label">Clase</span>
+        <span class="class-badge-num">5</span>
+      </div>
+      <div>
+        <div class="class-title">JavaScript — Lenguaje Multiparadigma</div>
+        <div class="class-title-sub">Historia · Navegador · Node.js · POO prototipal · Funcional · Eventos</div>
+      </div>
+    </div>
+
+    <div class="objectives">
+      <div class="objectives-label">Objetivos</div>
+      <ul>
+        <li>Conocer el origen y la evolución de JavaScript.</li>
+        <li>Entender el modelo de objetos basado en prototipos.</li>
+        <li>Identificar el paradigma basado en eventos como núcleo del lenguaje.</li>
+      </ul>
+    </div>
+
+    <div class="section-title">Historia y Evolución</div>
+    <div class="prose">
+      <p>Creado por <strong>Brendan Eich</strong> en 1995 para Netscape Navigator en tan solo <strong>10 días</strong>. Originalmente llamado Mocha, luego LiveScript, y finalmente JavaScript (nombre de marketing cercano a Java, aunque son lenguajes completamente distintos).</p>
+      <p>Estandarizado como <strong>ECMAScript</strong> (ES). Las versiones más importantes: <strong>ES5</strong> (2009), <strong>ES6/ES2015</strong> (clases, arrow functions, let/const, módulos), y actualizaciones anuales desde entonces. En 2009 nació <strong>Node.js</strong>, que lleva JavaScript al servidor.</p>
+    </div>
+
+    <div class="section-title">JavaScript — Características como Lenguaje Multiparadigma</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Característica</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td>Tipado dinámico y débil</td><td>Las variables pueden cambiar de tipo; las coerciones son implícitas.</td></tr>
+          <tr><td>Herencia prototipal</td><td>Los objetos heredan directamente de otros objetos (no de clases).</td></tr>
+          <tr><td>Funciones de primera clase</td><td>Las funciones son objetos: se asignan a variables, se pasan como argumentos.</td></tr>
+          <tr><td>Asincronía y eventos</td><td>Event Loop, callbacks, Promises, async/await son centrales al lenguaje.</td></tr>
+          <tr><td>Entorno dual</td><td>Corre en el navegador (DOM) y en el servidor (Node.js).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title">JavaScript — Paradigma Orientado a Objetos (Clases ES6)</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — POO con clases</span>
+      </div>
+      <pre><span class="kw">class</span> <span class="fn">Vehiculo</span> {
+    <span class="fn">constructor</span>(marca, velocidadMax) {
+        <span class="kw">this</span>.marca        = marca;
+        <span class="kw">this</span>.velocidadMax = velocidadMax;
+        <span class="kw">this</span>.velocidad    = <span class="num">0</span>;
+    }
+
+    <span class="fn">acelerar</span>(cantidad) {
+        <span class="kw">this</span>.velocidad = <span class="fn">Math.min</span>(<span class="kw">this</span>.velocidad + cantidad, <span class="kw">this</span>.velocidadMax);
+        <span class="kw">return this</span>;   <span class="cmt">// permite encadenar métodos</span>
+    }
+
+    <span class="fn">estado</span>() {
+        <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`${this.marca} viaja a ${this.velocidad} km/h`</span>);
+    }
+}
+
+<span class="kw">class</span> <span class="fn">Auto</span> <span class="kw">extends</span> <span class="fn">Vehiculo</span> {
+    <span class="fn">constructor</span>(marca) {
+        <span class="kw">super</span>(marca, <span class="num">200</span>);
+    }
+}
+
+<span class="kw">const</span> miAuto = <span class="kw">new</span> <span class="fn">Auto</span>(<span class="str">"Toyota"</span>);
+miAuto.<span class="fn">acelerar</span>(<span class="num">80</span>).<span class="fn">acelerar</span>(<span class="num">60</span>).<span class="fn">estado</span>();  <span class="cmt">// Toyota viaja a 140 km/h</span></pre>
+    </div>
+
+    <div class="section-title">JavaScript — Paradigma Funcional</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — map, filter, reduce</span>
+      </div>
+      <pre><span class="kw">const</span> productos = [
+    { nombre: <span class="str">"Laptop"</span>,  precio: <span class="num">15000</span> },
+    { nombre: <span class="str">"Mouse"</span>,   precio: <span class="num">350</span>   },
+    { nombre: <span class="str">"Monitor"</span>, precio: <span class="num">6500</span>  },
+    { nombre: <span class="str">"Teclado"</span>, precio: <span class="num">800</span>   },
+];
+
+<span class="cmt">// Obtener nombres de productos que cuestan más de 1000</span>
+<span class="kw">const</span> caros = productos
+    .<span class="fn">filter</span>(p => p.precio > <span class="num">1000</span>)
+    .<span class="fn">map</span>(p => p.nombre);
+
+<span class="fn">console</span>.<span class="fn">log</span>(caros);  <span class="cmt">// → ["Laptop", "Monitor"]</span>
+
+<span class="cmt">// Total de todos los productos</span>
+<span class="kw">const</span> total = productos.<span class="fn">reduce</span>((acc, p) => acc + p.precio, <span class="num">0</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`Total: $${total}`</span>);  <span class="cmt">// → Total: $22650</span></pre>
+    </div>
+
+    <div class="section-title">JavaScript — Paradigma Basado en Eventos y Asincronía</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Async / Await (petición HTTP)</span>
+      </div>
+      <pre><span class="cmt">// Obtener datos de una API sin bloquear el hilo principal</span>
+<span class="kw">async function</span> <span class="fn">obtenerUsuario</span>(id) {
+    <span class="kw">try</span> {
+        <span class="kw">const</span> respuesta = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">`https://api.ejemplo.com/usuarios/${id}`</span>);
+        <span class="kw">const</span> datos     = <span class="kw">await</span> respuesta.<span class="fn">json</span>();
+        <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`Usuario: ${datos.nombre}`</span>);
+    } <span class="kw">catch</span> (error) {
+        <span class="fn">console</span>.<span class="fn">error</span>(<span class="str">"Error al obtener datos:"</span>, error);
+    }
+}
+
+<span class="fn">obtenerUsuario</span>(<span class="num">42</span>);  <span class="cmt">// no bloquea — el programa continúa</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"Esta línea se imprime ANTES que la respuesta"</span>);</pre>
+    </div>
+
+    <div class="callout callout-warn">
+      <div class="callout-label">JavaScript es el único</div>
+      JavaScript es el <strong>único lenguaje que corre nativo en el navegador web</strong>. Esto lo hace indispensable para el desarrollo frontend. Con Node.js, el mismo código puede reutilizarse en el servidor — una ventaja única en el ecosistema de los tres lenguajes que estudiamos.
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════
+       CLASE 6
+  ═══════════════════════════════════════ -->
+  <section class="class-section" id="clase6">
+    <div class="class-header">
+      <div class="class-badge">
+        <span class="class-badge-label">Clase</span>
+        <span class="class-badge-num">6</span>
+      </div>
+      <div>
+        <div class="class-title">PHP — Lenguaje Multiparadigma</div>
+        <div class="class-title-sub">Historia · Web nativo · POO · Funcional · Integración con HTML</div>
+      </div>
+    </div>
+
+    <div class="objectives">
+      <div class="objectives-label">Objetivos</div>
+      <ul>
+        <li>Conocer el origen de PHP y su posición dominante en la web.</li>
+        <li>Comprender cómo PHP se integra directamente con HTML.</li>
+        <li>Reconocer los paradigmas que PHP soporta en versiones modernas.</li>
+      </ul>
+    </div>
+
+    <div class="section-title">Historia y Presencia en la Web</div>
+    <div class="prose">
+      <p>Creado por <strong>Rasmus Lerdorf</strong> en 1993-1994. Las siglas originales: <em>Personal Home Page</em>; hoy significa recursivamente <strong>PHP: Hypertext Preprocessor</strong>. Fue diseñado desde el principio para incrustarse dentro de páginas HTML y ejecutarse en un servidor web.</p>
+      <p>Actualmente impulsa aproximadamente el <strong>77% de los sitios web con backend conocido</strong>, incluyendo WordPress, Drupal, Joomla, Facebook (comenzó en PHP) y Wikipedia.</p>
+    </div>
+
+    <div class="section-title">PHP — Integración con HTML (su característica más singular)</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">PHP — Incrustado en HTML</span>
+      </div>
+      <pre><span class="cmt">&lt;!DOCTYPE html&gt;</span>
+<span class="str">&lt;html&gt;</span>
+<span class="str">&lt;body&gt;</span>
+    <span class="str">&lt;h1&gt;</span><span class="cmt">&lt;?php echo "Hola desde el servidor"; ?&gt;</span><span class="str">&lt;/h1&gt;</span>
+
+    <span class="cmt">&lt;?php</span>
+    <span class="cmt">// Lógica del servidor ejecutada antes de enviar la página</span>
+    <span class="kw">$hora</span> = <span class="fn">date</span>(<span class="str">'H'</span>);
+
+    <span class="kw">if</span> (<span class="kw">$hora</span> < <span class="num">12</span>) {
+        <span class="kw">echo</span> <span class="str">"&lt;p&gt;Buenos días&lt;/p&gt;"</span>;
+    } <span class="kw">elseif</span> (<span class="kw">$hora</span> < <span class="num">18</span>) {
+        <span class="kw">echo</span> <span class="str">"&lt;p&gt;Buenas tardes&lt;/p&gt;"</span>;
+    } <span class="kw">else</span> {
+        <span class="kw">echo</span> <span class="str">"&lt;p&gt;Buenas noches&lt;/p&gt;"</span>;
+    }
+    <span class="cmt">?&gt;</span>
+<span class="str">&lt;/body&gt;</span>
+<span class="str">&lt;/html&gt;</span></pre>
+    </div>
+
+    <div class="section-title">PHP — Paradigma Orientado a Objetos (PHP 8+)</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">PHP — POO Moderna</span>
+      </div>
+      <pre><span class="cmt">&lt;?php</span>
+<span class="kw">class</span> <span class="fn">Estudiante</span> {
+    <span class="kw">public function</span> <span class="fn">__construct</span>(
+        <span class="kw">private string</span> <span class="kw">$nombre</span>,
+        <span class="kw">private float</span>  <span class="kw">$promedio</span>
+    ) {}  <span class="cmt">// PHP 8: constructor promotion</span>
+
+    <span class="kw">public function</span> <span class="fn">estado</span>(): <span class="kw">string</span> {
+        <span class="kw">return</span> <span class="kw">$this</span>->promedio >= <span class="num">60</span> ? <span class="str">"Aprobado"</span> : <span class="str">"Reprobado"</span>;
+    }
+
+    <span class="kw">public function</span> <span class="fn">__toString</span>(): <span class="kw">string</span> {
+        <span class="kw">return</span> <span class="str">"{$this->nombre} — {$this->estado()}"</span>;
+    }
+}
+
+<span class="kw">$estudiante</span> = <span class="kw">new</span> <span class="fn">Estudiante</span>(<span class="str">"María"</span>, <span class="num">75.5</span>);
+<span class="kw">echo</span> <span class="kw">$estudiante</span>;  <span class="cmt">// → María — Aprobado</span></pre>
+    </div>
+
+    <div class="section-title">PHP — Paradigma Funcional</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">PHP — Funciones anónimas y array_map / array_filter</span>
+      </div>
+      <pre><span class="cmt">&lt;?php</span>
+<span class="kw">$notas</span> = [<span class="num">45</span>, <span class="num">78</span>, <span class="num">90</span>, <span class="num">55</span>, <span class="num">88</span>, <span class="num">30</span>];
+
+<span class="cmt">// Filtrar aprobados (>= 60) usando función anónima</span>
+<span class="kw">$aprobados</span> = <span class="fn">array_filter</span>(<span class="kw">$notas</span>, <span class="kw">fn</span>(<span class="kw">$n</span>) => <span class="kw">$n</span> >= <span class="num">60</span>);
+
+<span class="cmt">// Aplicar bono de 5 puntos a cada aprobado</span>
+<span class="kw">$conBono</span> = <span class="fn">array_map</span>(<span class="kw">fn</span>(<span class="kw">$n</span>) => <span class="fn">min</span>(<span class="kw">$n</span> + <span class="num">5</span>, <span class="num">100</span>), <span class="kw">$aprobados</span>);
+
+<span class="fn">print_r</span>(<span class="kw">$conBono</span>);
+<span class="cmt">// → [83, 95, 93]  (notas 78, 90, 88 con bono)</span></pre>
+    </div>
+
+    <div class="section-title">Evolución de PHP — Del Procedural al Moderno</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Versión</th><th>Año</th><th>Hito importante</th></tr></thead>
+        <tbody>
+          <tr><td>PHP 3</td><td>1998</td><td>Primera versión ampliamente adoptada. Estilo puramente procedimental.</td></tr>
+          <tr><td>PHP 5</td><td>2004</td><td>POO robusta: clases, interfaces, excepciones, PDO para bases de datos.</td></tr>
+          <tr><td>PHP 7</td><td>2015</td><td>Rendimiento 2×, tipos escalares, operador de nave espacial.</td></tr>
+          <tr><td>PHP 8</td><td>2020</td><td>JIT compiler, match, named arguments, fibers, constructor promotion.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-label">PHP Hoy</div>
+      PHP moderno (versión 8+) es un lenguaje radicalmente diferente al PHP de los años 2000. Soporta tipado fuerte opcional, programación funcional con arrow functions, POO completa con interfaces y traits, y un compilador JIT que lo hace significativamente más rápido.
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════
+       CLASE 7
+  ═══════════════════════════════════════ -->
+  <section class="class-section" id="clase7">
+    <div class="class-header">
+      <div class="class-badge">
+        <span class="class-badge-label">Clase</span>
+        <span class="class-badge-num">7</span>
+      </div>
+      <div>
+        <div class="class-title">Comparativa: Python, JavaScript y PHP</div>
+        <div class="class-title-sub">Sintaxis · Paradigmas · Ecosistema · Cuándo elegir cada uno</div>
+      </div>
+    </div>
+
+    <div class="objectives">
+      <div class="objectives-label">Objetivos</div>
+      <ul>
+        <li>Comparar los tres lenguajes en aspectos clave: sintaxis, tipado, paradigmas y ecosistema.</li>
+        <li>Comprender en qué contextos cada lenguaje brilla.</li>
+        <li>Leer el mismo programa escrito en los tres lenguajes simultáneamente.</li>
+      </ul>
+    </div>
+
+    <div class="section-title">Comparativa General</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Aspecto</th><th>Python</th><th>JavaScript</th><th>PHP</th></tr></thead>
+        <tbody>
+          <tr><td>Creado en</td><td>1991</td><td>1995</td><td>1994</td></tr>
+          <tr><td>Tipado</td><td>Dinámico, fuerte</td><td>Dinámico, débil</td><td>Dinámico, débil (fuerte en PHP 8 con hints)</td></tr>
+          <tr><td>Ejecución</td><td>Interpretado (CPython)</td><td>JIT en V8 (Node/navegador)</td><td>Interpretado + JIT (PHP 8)</td></tr>
+          <tr><td>Delimitadores de bloque</td><td>Indentación</td><td>Llaves <code>{ }</code></td><td>Llaves <code>{ }</code></td></tr>
+          <tr><td>Variables</td><td><code>nombre = valor</code></td><td><code>let nombre = valor</code></td><td><code>$nombre = valor</code></td></tr>
+          <tr><td>Funciones</td><td><code>def func():</code></td><td><code>function func(){}</code> / <code>() =&gt; {}</code></td><td><code>function func(){}</code> / <code>fn() =&gt;</code></td></tr>
+          <tr><td>Frontend web</td><td>No nativo</td><td>Sí (nativo)</td><td>No nativo</td></tr>
+          <tr><td>Backend web</td><td>Flask, Django, FastAPI</td><td>Express, Next.js</td><td>Nativo (Apache/Nginx)</td></tr>
+          <tr><td>Datos / ML / IA</td><td>Dominante (NumPy, TF)</td><td>Creciente (TensorFlow.js)</td><td>Limitado</td></tr>
+          <tr><td>Gestor de paquetes</td><td>pip / conda</td><td>npm / yarn / pnpm</td><td>Composer</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title">El mismo programa en los tres lenguajes</div>
+    <div class="prose"><p>Calcular el promedio de calificaciones y determinar si el estudiante aprobó:</p></div>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">Python</span>
+      </div>
+      <pre><span class="kw">def</span> <span class="fn">evaluar_estudiante</span>(nombre, notas):
+    promedio = <span class="fn">sum</span>(notas) / <span class="fn">len</span>(notas)
+    estado   = <span class="str">"Aprobado"</span> <span class="kw">if</span> promedio >= <span class="num">60</span> <span class="kw">else</span> <span class="str">"Reprobado"</span>
+    <span class="fn">print</span>(<span class="str">f"{nombre}: promedio={promedio:.1f} → {estado}"</span>)
+
+<span class="fn">evaluar_estudiante</span>(<span class="str">"Ana"</span>, [<span class="num">75</span>, <span class="num">80</span>, <span class="num">90</span>, <span class="num">65</span>])
+<span class="cmt"># → Ana: promedio=77.5 → Aprobado</span></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript</span>
+      </div>
+      <pre><span class="kw">function</span> <span class="fn">evaluarEstudiante</span>(nombre, notas) {
+    <span class="kw">const</span> promedio = notas.<span class="fn">reduce</span>((a, b) => a + b, <span class="num">0</span>) / notas.length;
+    <span class="kw">const</span> estado   = promedio >= <span class="num">60</span> ? <span class="str">"Aprobado"</span> : <span class="str">"Reprobado"</span>;
+    <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`${nombre}: promedio=${promedio.toFixed(1)} → ${estado}`</span>);
+}
+
+<span class="fn">evaluarEstudiante</span>(<span class="str">"Ana"</span>, [<span class="num">75</span>, <span class="num">80</span>, <span class="num">90</span>, <span class="num">65</span>]);
+<span class="cmt">// → Ana: promedio=77.5 → Aprobado</span></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">PHP</span>
+      </div>
+      <pre><span class="cmt">&lt;?php</span>
+<span class="kw">function</span> <span class="fn">evaluarEstudiante</span>(<span class="kw">string</span> <span class="kw">$nombre</span>, <span class="kw">array</span> <span class="kw">$notas</span>): <span class="kw">void</span> {
+    <span class="kw">$promedio</span> = <span class="fn">array_sum</span>(<span class="kw">$notas</span>) / <span class="fn">count</span>(<span class="kw">$notas</span>);
+    <span class="kw">$estado</span>   = <span class="kw">$promedio</span> >= <span class="num">60</span> ? <span class="str">"Aprobado"</span> : <span class="str">"Reprobado"</span>;
+    <span class="kw">echo</span> <span class="str">"$nombre: promedio={$promedio} → $estado\n"</span>;
+}
+
+<span class="fn">evaluarEstudiante</span>(<span class="str">"Ana"</span>, [<span class="num">75</span>, <span class="num">80</span>, <span class="num">90</span>, <span class="num">65</span>]);
+<span class="cmt">// → Ana: promedio=77.5 → Aprobado</span></pre>
+    </div>
+
+    <div class="section-title">¿Cuándo elegir cada uno?</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Situación</th><th>Lenguaje recomendado</th><th>Razón</th></tr></thead>
+        <tbody>
+          <tr><td>Ciencia de datos, IA, Machine Learning</td><td>Python</td><td>Ecosistema NumPy/Pandas/TensorFlow sin rival.</td></tr>
+          <tr><td>Aplicación web full-stack (una sola tecnología)</td><td>JavaScript</td><td>Frontend + backend con Node.js, reutilización de código.</td></tr>
+          <tr><td>Sitio web, CMS, e-commerce</td><td>PHP</td><td>Integración nativa con servidores web, enorme ecosistema (WordPress).</td></tr>
+          <tr><td>Scripts de automatización y CLI</td><td>Python</td><td>Librería estándar rica, sintaxis limpia, portable.</td></tr>
+          <tr><td>APIs REST o GraphQL backend</td><td>Python o JavaScript</td><td>FastAPI / Express — ambos son rápidos y modernos.</td></tr>
+          <tr><td>Interfaces interactivas en navegador</td><td>JavaScript</td><td>Único lenguaje nativo del navegador.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════
+       CLASE 8
+  ═══════════════════════════════════════ -->
+  <section class="class-section" id="clase8">
+    <div class="class-header">
+      <div class="class-badge">
+        <span class="class-badge-label">Clase</span>
+        <span class="class-badge-num">8</span>
+      </div>
+      <div>
+        <div class="class-title">Beneficios del Multiparadigma</div>
+        <div class="class-title-sub">Flexibilidad · Expresividad · Industria · El futuro de los lenguajes</div>
+      </div>
+    </div>
+
+    <div class="objectives">
+      <div class="objectives-label">Objetivos</div>
+      <ul>
+        <li>Articular con claridad los beneficios concretos del multiparadigma.</li>
+        <li>Relacionar el multiparadigma con la industria del software actual.</li>
+        <li>Comprender por qué aprender varios paradigmas es una ventaja competitiva.</li>
+      </ul>
+    </div>
+
+    <div class="section-title">Beneficio 1 — Flexibilidad de Expresión</div>
+    <div class="prose">
+      <p>El programador puede elegir el <strong>nivel de abstracción más adecuado</strong> para cada tarea. Tareas simples se escriben de forma simple (imperativa); sistemas complejos se modelan con objetos; transformaciones de datos se expresan funcionalmente.</p>
+      <p>Esto es como tener en la caja de herramientas tanto un martillo, como un destornillador, como una llave inglesa — y elegir la correcta para cada tornillo.</p>
+    </div>
+
+    <div class="section-title">Beneficio 2 — Código más Legible y Mantenible</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">Python — Comparación de expresividad</span>
+      </div>
+      <pre><span class="cmt"># Imperativo: describe CÓMO (verboso, más difícil de leer)</span>
+resultado = []
+<span class="kw">for</span> nombre <span class="kw">in</span> nombres:
+    <span class="kw">if</span> nombre.<span class="fn">startswith</span>(<span class="str">'A'</span>):
+        resultado.<span class="fn">append</span>(nombre.<span class="fn">upper</span>())
+
+<span class="cmt"># Funcional/declarativo: describe QUÉ (conciso, expresivo)</span>
+resultado = [n.<span class="fn">upper</span>() <span class="kw">for</span> n <span class="kw">in</span> nombres <span class="kw">if</span> n.<span class="fn">startswith</span>(<span class="str">'A'</span>)]
+
+<span class="cmt"># Ambos producen el mismo resultado — el segundo expresa la INTENCIÓN</span></pre>
+    </div>
+
+    <div class="section-title">Beneficio 3 — Adaptación a la Escala del Problema</div>
+    <div class="prose">
+      <p>Un script de 50 líneas no necesita clases ni jerarquías de herencia. Una aplicación empresarial de 500,000 líneas sí las necesita. El multiparadigma permite escalar el estilo junto con el problema:</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Escala del proyecto</th><th>Paradigma típicamente dominante</th></tr></thead>
+        <tbody>
+          <tr><td>Script de automatización (50-200 líneas)</td><td>Procedimental / Funcional</td></tr>
+          <tr><td>API o servicio (500-5,000 líneas)</td><td>Funcional + POO parcial</td></tr>
+          <tr><td>Aplicación empresarial (50,000+ líneas)</td><td>POO + principios SOLID + funcional</td></tr>
+          <tr><td>Sistema reactivo / en tiempo real</td><td>Eventos + Reactivo + Funcional</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title">Beneficio 4 — Relevancia en la Industria</div>
+    <div class="prose">
+      <p>Los tres lenguajes que estudiamos están entre los <strong>10 más usados del mundo</strong> según el índice TIOBE y la encuesta anual de Stack Overflow. Dominan sectores enteros:</p>
+    </div>
+    <div class="flow-box">  SECTORES INDUSTRIALES POR LENGUAJE (2024-2025)
+  ────────────────────────────────────────────────
+  Python     → IA / ML / Data Science / DevOps / Ciencia
+              Empresas: Google, NASA, Netflix, Instagram
+
+  JavaScript → Web frontend + fullstack + apps híbridas
+              Empresas: Facebook, Twitter, Airbnb, LinkedIn
+
+  PHP        → Web tradicional + CMS + e-commerce
+              Plataformas: WordPress (43% de la web),
+              Magento, Drupal, Wikipedia</div>
+
+    <div class="section-title">Beneficio 5 — Transferencia de Conocimiento entre Paradigmas</div>
+    <div class="prose">
+      <p>Aprender a pensar funcionalmente en Python te prepara para entender el estilo <code>.map().filter().reduce()</code> de JavaScript. Entender POO en PHP te prepara para Java, C# o Kotlin. <strong>Los paradigmas son portables</strong> — la habilidad trasciende el lenguaje.</p>
+    </div>
+
+    <div class="section-title">El Futuro — Multiparadigma como Norma</div>
+    <div class="prose">
+      <p>Los lenguajes modernos más adoptados en los últimos años confirman la tendencia:</p>
+      <ul>
+        <li><strong>Kotlin</strong> (Android): POO + funcional + coroutines.</li>
+        <li><strong>Swift</strong> (iOS/macOS): POO + funcional + value types.</li>
+        <li><strong>Rust</strong>: funcional + imperativo + sistema de tipos estricto.</li>
+        <li><strong>TypeScript</strong>: JavaScript con tipado + POO mejorada.</li>
+      </ul>
+      <p>Los paradigmas puros son más relevantes en la academia para entender los fundamentos. En la industria, <strong>el multiparadigma pragmático es el estándar</strong>.</p>
+    </div>
+
+    <div class="section-title">Resumen — El Árbol de Decisión del Programador Moderno</div>
+    <div class="flow-box">  ¿Qué estilo uso para este fragmento de código?
+  ──────────────────────────────────────────────────
+  ¿Necesito modelar entidades del mundo real       → POO
+    con estado y comportamiento compartido?
+
+  ¿Necesito transformar / filtrar / reducir datos  → Funcional
+    sin efectos secundarios?
+
+  ¿Necesito ejecutar pasos secuenciales con        → Imperativo
+    lógica de control simple?
+
+  ¿Necesito reaccionar a eventos externos          → Basado en
+    (clic, red, tiempo)?                             Eventos
+
+  ¿Necesito todo lo anterior en el mismo proyecto? → Multiparadigma
+                                                     Python / JS / PHP</div>
+
+    <div class="activity">
+      <div class="activity-label">Reflexión Final</div>
+      <h4>Antes de continuar al estudio de cada lenguaje en profundidad, reflexiona:</h4>
+      <ol style="padding-left:20px; color:var(--text); font-size:14px; line-height:2.2;">
+        <li>¿Qué paradigma te parece más natural para la forma en que ya piensas?</li>
+        <li>¿En qué proyectos de tu carrera podrías aplicar Python? ¿JavaScript? ¿PHP?</li>
+        <li>¿Por qué crees que ninguno de los tres lenguajes fue diseñado como "puro"?</li>
+        <li>Si tuvieras que elegir uno de los tres para especializarte, ¿cuál sería y por qué?</li>
+      </ol>
+    </div>
+  </section>
+
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════
+       CLASE 9 — Introducción a JavaScript
+  ═══════════════════════════════════════ -->
+  <section class="class-section" id="clase9">
+    <div class="class-header">
+      <div class="class-badge">
+        <span class="class-badge-label">Clase</span>
+        <span class="class-badge-num">9</span>
+      </div>
+      <div>
+        <div class="class-title">Introducción a JavaScript</div>
+        <div class="class-title-sub">Historia · Variables · Tipos de Datos · Operadores · Condicionales · Bucles</div>
+      </div>
+    </div>
+
+    <div class="objectives">
+      <div class="objectives-label">Objetivos</div>
+      <ul>
+        <li>Conocer el origen y evolución de JavaScript como lenguaje de la web.</li>
+        <li>Declarar variables con <code>let</code> y <code>const</code> y comprender sus diferencias.</li>
+        <li>Identificar y usar los tipos de datos fundamentales: String, Number, Boolean, Null, Undefined y Array.</li>
+        <li>Aplicar operadores aritméticos, de asignación y de comparación.</li>
+        <li>Controlar el flujo del programa con condicionales y bucles.</li>
+      </ul>
+    </div>
+
+    <!-- ── Historia ── -->
+    <div class="section-title">Historia de JavaScript</div>
+    <div class="prose">
+      <p><strong>Brendan Eich</strong> creó JavaScript en <strong>1995</strong> mientras trabajaba en Netscape Communications. El lenguaje fue diseñado y escrito en tan solo <strong>10 días</strong> con el objetivo de agregar interactividad a las páginas web estáticas de la época.</p>
+      <p>Su nombre original fue <strong>Mocha</strong>, luego <strong>LiveScript</strong>, y finalmente fue renombrado a <strong>JavaScript</strong> como estrategia de marketing para asociarlo con la popularidad de Java — aunque los dos lenguajes son completamente distintos en diseño y propósito.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Año</th><th>Hito</th></tr></thead>
+        <tbody>
+          <tr><td>1995</td><td>Brendan Eich crea JavaScript en Netscape en 10 días.</td></tr>
+          <tr><td>1997</td><td>Estandarización como <strong>ECMAScript 1</strong> (ECMA-262).</td></tr>
+          <tr><td>2009</td><td><strong>Node.js</strong>: JavaScript llega al servidor (Ryan Dahl).</td></tr>
+          <tr><td>2015</td><td><strong>ES6 / ES2015</strong>: la mayor actualización del lenguaje — <code>let</code>, <code>const</code>, arrow functions, clases, módulos.</td></tr>
+          <tr><td>2016–hoy</td><td>Actualizaciones anuales (ES2016, ES2017…). JavaScript domina el desarrollo web.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout callout-info">
+      <div class="callout-label">Dato clave</div>
+      JavaScript es el <strong>único lenguaje que corre nativo en todos los navegadores web</strong>. Esto lo hace indispensable: sin JavaScript, las páginas web serían documentos estáticos sin interacción.
+    </div>
+
+    <!-- ── Variables ── -->
+    <div class="section-title">Variables</div>
+    <div class="prose">
+      <p>Una variable es un <strong>espacio con nombre en la memoria</strong> donde guardamos un valor para usarlo después. En JavaScript moderno existen tres formas de declarar variables:</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Palabra clave</th><th>Alcance</th><th>¿Se puede reasignar?</th><th>¿Se puede redeclarar?</th><th>Uso recomendado</th></tr></thead>
+        <tbody>
+          <tr><td><code>var</code></td><td>Función</td><td>Sí</td><td>Sí</td><td>Evitar en código moderno</td></tr>
+          <tr><td><code>let</code></td><td>Bloque <code>{ }</code></td><td>Sí</td><td>No</td><td>Variables que cambian de valor</td></tr>
+          <tr><td><code>const</code></td><td>Bloque <code>{ }</code></td><td>No</td><td>No</td><td>Valores que no deben cambiar</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Variables</span>
+      </div>
+      <pre><span class="cmt">// const: el valor no cambia</span>
+<span class="kw">const</span> PI = <span class="num">3.14159</span>;
+<span class="kw">const</span> nombre = <span class="str">"Ana"</span>;
+
+<span class="cmt">// let: el valor puede cambiar</span>
+<span class="kw">let</span> edad = <span class="num">20</span>;
+edad = <span class="num">21</span>;          <span class="cmt">// reasignación válida</span>
+
+<span class="cmt">// var (estilo antiguo — evitar)</span>
+<span class="kw">var</span> ciudad = <span class="str">"Tegucigalpa"</span>;
+
+<span class="fn">console</span>.<span class="fn">log</span>(nombre, edad);  <span class="cmt">// → Ana 21</span>
+
+<span class="cmt">// Intentar reasignar una const → error</span>
+<span class="cmt">// PI = 3;  ← TypeError: Assignment to constant variable</span></pre>
+    </div>
+
+    <!-- ── Tipos de datos ── -->
+    <div class="section-title">Tipos de Datos</div>
+    <div class="prose">
+      <p>JavaScript es de <strong>tipado dinámico</strong>: no se declara el tipo al crear la variable; el intérprete lo determina según el valor asignado. Los tipos primitivos fundamentales son:</p>
+    </div>
+
+    <div class="subsection-title">String (Cadena de texto)</div>
+    <div class="prose">
+      <p>Representa texto. Se escribe entre comillas simples, dobles, o <em>template literals</em> (backticks) que permiten incrustar expresiones con <code>${}</code>.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — String</span>
+      </div>
+      <pre><span class="kw">const</span> saludo1 = <span class="str">"Hola, mundo"</span>;       <span class="cmt">// comillas dobles</span>
+<span class="kw">const</span> saludo2 = <span class="str">'Hola, mundo'</span>;       <span class="cmt">// comillas simples</span>
+<span class="kw">const</span> nombre  = <span class="str">"Ricardo"</span>;
+<span class="kw">const</span> saludo3 = <span class="str">`Hola, ${nombre}!`</span>;  <span class="cmt">// template literal → "Hola, Ricardo!"</span>
+
+<span class="cmt">// Propiedades y métodos útiles</span>
+<span class="fn">console</span>.<span class="fn">log</span>(saludo1.<span class="fn">length</span>);        <span class="cmt">// → 11  (número de caracteres)</span>
+<span class="fn">console</span>.<span class="fn">log</span>(saludo1.<span class="fn">toUpperCase</span>()); <span class="cmt">// → "HOLA, MUNDO"</span>
+<span class="fn">console</span>.<span class="fn">log</span>(saludo1.<span class="fn">includes</span>(<span class="str">"mundo"</span>)); <span class="cmt">// → true</span>
+<span class="fn">console</span>.<span class="fn">log</span>(saludo1[<span class="num">0</span>]);            <span class="cmt">// → "H"  (acceso por índice)</span></pre>
+    </div>
+
+    <div class="subsection-title">Number (Número)</div>
+    <div class="prose">
+      <p>JavaScript usa un único tipo para todos los números: enteros y decimales. También existen valores especiales como <code>NaN</code> (Not a Number) e <code>Infinity</code>.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Number</span>
+      </div>
+      <pre><span class="kw">const</span> entero   = <span class="num">42</span>;
+<span class="kw">const</span> decimal  = <span class="num">3.14</span>;
+<span class="kw">const</span> negativo = <span class="num">-7</span>;
+
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">typeof</span> entero);    <span class="cmt">// → "number"</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">typeof</span> decimal);   <span class="cmt">// → "number"  (mismo tipo)</span>
+
+<span class="cmt">// Valores especiales</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="num">10</span> / <span class="num">0</span>);           <span class="cmt">// → Infinity</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"abc"</span> * <span class="num">2</span>);        <span class="cmt">// → NaN  (Not a Number)</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">isNaN</span>(<span class="str">"abc"</span> * <span class="num">2</span>)); <span class="cmt">// → true</span>
+
+<span class="cmt">// Métodos útiles</span>
+<span class="fn">console</span>.<span class="fn">log</span>(decimal.<span class="fn">toFixed</span>(<span class="num">1</span>)); <span class="cmt">// → "3.1"  (1 decimal)</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">Math</span>.<span class="fn">round</span>(<span class="num">4.7</span>));    <span class="cmt">// → 5</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">Math</span>.<span class="fn">max</span>(<span class="num">3</span>, <span class="num">8</span>, <span class="num">1</span>));  <span class="cmt">// → 8</span></pre>
+    </div>
+
+    <div class="subsection-title">Boolean (Booleano)</div>
+    <div class="prose">
+      <p>Solo puede tener dos valores: <code>true</code> o <code>false</code>. Es el resultado de cualquier comparación lógica.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Boolean</span>
+      </div>
+      <pre><span class="kw">const</span> esMayor  = <span class="kw">true</span>;
+<span class="kw">const</span> esMenor  = <span class="kw">false</span>;
+<span class="kw">const</span> aprobado = <span class="num">85</span> >= <span class="num">60</span>;   <span class="cmt">// → true  (resultado de comparación)</span>
+<span class="kw">const</span> esAdmin  = <span class="kw">false</span>;
+
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">typeof</span> aprobado);  <span class="cmt">// → "boolean"</span>
+<span class="fn">console</span>.<span class="fn">log</span>(aprobado);         <span class="cmt">// → true</span>
+
+<span class="cmt">// Operadores lógicos</span>
+<span class="fn">console</span>.<span class="fn">log</span>(aprobado && esMayor);  <span class="cmt">// → true  (AND: ambos deben ser true)</span>
+<span class="fn">console</span>.<span class="fn">log</span>(aprobado || esAdmin);  <span class="cmt">// → true  (OR: al menos uno es true)</span>
+<span class="fn">console</span>.<span class="fn">log</span>(!esAdmin);             <span class="cmt">// → true  (NOT: invierte el valor)</span></pre>
+    </div>
+
+    <div class="subsection-title">Null y Undefined</div>
+    <div class="prose">
+      <p><code>null</code> representa la <strong>ausencia intencional</strong> de un valor — el programador lo asigna explícitamente para indicar "vacío".</p>
+      <p><code>undefined</code> significa que una variable fue declarada pero <strong>no se le asignó ningún valor</strong>. JavaScript lo asigna automáticamente.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Null y Undefined</span>
+      </div>
+      <pre><span class="cmt">// null: ausencia de valor intencional</span>
+<span class="kw">let</span> usuarioActivo = <span class="kw">null</span>;   <span class="cmt">// "aún no hay usuario seleccionado"</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">typeof</span> usuarioActivo);  <span class="cmt">// → "object"  (particularidad histórica de JS)</span>
+
+<span class="cmt">// undefined: variable declarada sin valor</span>
+<span class="kw">let</span> resultado;
+<span class="fn">console</span>.<span class="fn">log</span>(resultado);             <span class="cmt">// → undefined</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">typeof</span> resultado);      <span class="cmt">// → "undefined"</span>
+
+<span class="cmt">// Comparación entre null y undefined</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="kw">null</span> == <span class="kw">undefined</span>);    <span class="cmt">// → true   (igualdad débil)</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="kw">null</span> === <span class="kw">undefined</span>);   <span class="cmt">// → false  (igualdad estricta: tipos distintos)</span></pre>
+    </div>
+
+    <div class="subsection-title">Array (Arreglo)</div>
+    <div class="prose">
+      <p>Un Array es una <strong>colección ordenada de valores</strong>. Los elementos se acceden por su índice (empezando en 0). Puede contener cualquier tipo de dato, incluso mezclados.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Array</span>
+      </div>
+      <pre><span class="kw">const</span> frutas  = [<span class="str">"manzana"</span>, <span class="str">"banano"</span>, <span class="str">"naranja"</span>];
+<span class="kw">const</span> notas   = [<span class="num">85</span>, <span class="num">90</span>, <span class="num">78</span>, <span class="num">92</span>];
+<span class="kw">const</span> mezcla  = [<span class="num">1</span>, <span class="str">"dos"</span>, <span class="kw">true</span>, <span class="kw">null</span>];  <span class="cmt">// tipos mixtos (válido)</span>
+
+<span class="cmt">// Acceso por índice (empieza en 0)</span>
+<span class="fn">console</span>.<span class="fn">log</span>(frutas[<span class="num">0</span>]);        <span class="cmt">// → "manzana"</span>
+<span class="fn">console</span>.<span class="fn">log</span>(frutas[<span class="num">2</span>]);        <span class="cmt">// → "naranja"</span>
+
+<span class="cmt">// Propiedad length</span>
+<span class="fn">console</span>.<span class="fn">log</span>(frutas.<span class="fn">length</span>);    <span class="cmt">// → 3</span>
+
+<span class="cmt">// Métodos comunes</span>
+frutas.<span class="fn">push</span>(<span class="str">"uva"</span>);           <span class="cmt">// agrega al final → ["manzana","banano","naranja","uva"]</span>
+frutas.<span class="fn">pop</span>();                 <span class="cmt">// elimina el último → ["manzana","banano","naranja"]</span>
+<span class="fn">console</span>.<span class="fn">log</span>(frutas.<span class="fn">includes</span>(<span class="str">"banano"</span>)); <span class="cmt">// → true</span>
+<span class="fn">console</span>.<span class="fn">log</span>(frutas.<span class="fn">indexOf</span>(<span class="str">"naranja"</span>)); <span class="cmt">// → 2  (posición)</span>
+
+<span class="cmt">// Calcular promedio de notas</span>
+<span class="kw">const</span> suma     = notas.<span class="fn">reduce</span>((acc, n) => acc + n, <span class="num">0</span>);
+<span class="kw">const</span> promedio = suma / notas.<span class="fn">length</span>;
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`Promedio: ${promedio}`</span>);  <span class="cmt">// → Promedio: 86.25</span></pre>
+    </div>
+
+    <!-- ── Operadores ── -->
+    <div class="section-title">Operadores</div>
+
+    <div class="subsection-title">Operadores Aritméticos</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Operadores Aritméticos</span>
+      </div>
+      <pre><span class="kw">let</span> a = <span class="num">10</span>, b = <span class="num">3</span>;
+
+<span class="fn">console</span>.<span class="fn">log</span>(a + b);   <span class="cmt">// →  13  Suma</span>
+<span class="fn">console</span>.<span class="fn">log</span>(a - b);   <span class="cmt">// →   7  Resta</span>
+<span class="fn">console</span>.<span class="fn">log</span>(a * b);   <span class="cmt">// →  30  Multiplicación</span>
+<span class="fn">console</span>.<span class="fn">log</span>(a / b);   <span class="cmt">// →  3.333...  División</span>
+<span class="fn">console</span>.<span class="fn">log</span>(a % b);   <span class="cmt">// →   1  Módulo (residuo)</span>
+<span class="fn">console</span>.<span class="fn">log</span>(a ** b);  <span class="cmt">// →1000  Potencia (10³)</span>
+
+<span class="cmt">// Concatenación de strings con +</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"Hola"</span> + <span class="str">" "</span> + <span class="str">"mundo"</span>);  <span class="cmt">// → "Hola mundo"</span>
+
+<span class="cmt">// Cuidado con la coerción</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"5"</span> + <span class="num">3</span>);   <span class="cmt">// → "53"  (JS convierte 3 a string)</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"5"</span> - <span class="num">3</span>);   <span class="cmt">// →  2   (JS convierte "5" a número)</span></pre>
+    </div>
+
+    <div class="subsection-title">Operadores de Asignación</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Operadores de Asignación</span>
+      </div>
+      <pre><span class="kw">let</span> x = <span class="num">10</span>;
+
+x += <span class="num">5</span>;   <span class="cmt">// x = x + 5  → 15</span>
+x -= <span class="num">3</span>;   <span class="cmt">// x = x - 3  → 12</span>
+x *= <span class="num">2</span>;   <span class="cmt">// x = x * 2  → 24</span>
+x /= <span class="num">4</span>;   <span class="cmt">// x = x / 4  →  6</span>
+x %= <span class="num">4</span>;   <span class="cmt">// x = x % 4  →  2</span>
+
+<span class="fn">console</span>.<span class="fn">log</span>(x);  <span class="cmt">// → 2</span>
+
+<span class="cmt">// Incremento y decremento</span>
+<span class="kw">let</span> contador = <span class="num">0</span>;
+contador++;      <span class="cmt">// contador = contador + 1  → 1</span>
+contador++;      <span class="cmt">// → 2</span>
+contador--;      <span class="cmt">// → 1</span>
+<span class="fn">console</span>.<span class="fn">log</span>(contador);  <span class="cmt">// → 1</span></pre>
+    </div>
+
+    <div class="subsection-title">Operadores de Comparación</div>
+    <div class="prose">
+      <p>Siempre devuelven un <code>Boolean</code>. En JavaScript es fundamental distinguir entre <code>==</code> (igualdad débil, convierte tipos) y <code>===</code> (igualdad estricta, compara tipo y valor).</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Operadores de Comparación</span>
+      </div>
+      <pre><span class="kw">let</span> edad = <span class="num">18</span>;
+
+<span class="fn">console</span>.<span class="fn">log</span>(edad >  <span class="num">17</span>);   <span class="cmt">// → true   Mayor que</span>
+<span class="fn">console</span>.<span class="fn">log</span>(edad <  <span class="num">21</span>);   <span class="cmt">// → true   Menor que</span>
+<span class="fn">console</span>.<span class="fn">log</span>(edad >= <span class="num">18</span>);   <span class="cmt">// → true   Mayor o igual</span>
+<span class="fn">console</span>.<span class="fn">log</span>(edad <= <span class="num">17</span>);   <span class="cmt">// → false  Menor o igual</span>
+
+<span class="cmt">// Igualdad débil (==) — convierte tipos antes de comparar</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="num">5</span>  == <span class="str">"5"</span>);    <span class="cmt">// → true   (el string "5" se convierte a número)</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="num">0</span>  == <span class="kw">false</span>);  <span class="cmt">// → true   (false se convierte a 0)</span>
+
+<span class="cmt">// Igualdad estricta (===) — compara tipo Y valor ← usar siempre</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="num">5</span>  === <span class="str">"5"</span>);   <span class="cmt">// → false  (number vs string)</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="num">18</span> === <span class="num">18</span>);    <span class="cmt">// → true</span>
+
+<span class="cmt">// Desigualdad</span>
+<span class="fn">console</span>.<span class="fn">log</span>(edad != <span class="num">21</span>);   <span class="cmt">// → true   (débil)</span>
+<span class="fn">console</span>.<span class="fn">log</span>(edad !== <span class="num">21</span>);  <span class="cmt">// → true   (estricta — preferida)</span></pre>
+    </div>
+
+    <div class="callout callout-warn">
+      <div class="callout-label">Buena práctica</div>
+      Usa siempre <code>===</code> y <code>!==</code> en lugar de <code>==</code> y <code>!=</code>. La igualdad débil (<code>==</code>) realiza conversiones de tipo implícitas que generan resultados inesperados y son una fuente común de bugs en JavaScript.
+    </div>
+
+    <!-- ── Condicionales ── -->
+    <div class="section-title">Condicionales</div>
+    <div class="prose">
+      <p>Los condicionales permiten ejecutar distintos bloques de código según si una condición es verdadera o falsa.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — if / else if / else</span>
+      </div>
+      <pre><span class="kw">const</span> nota = <span class="num">75</span>;
+<span class="kw">let</span> calificacion;
+
+<span class="kw">if</span> (nota >= <span class="num">90</span>) {
+    calificacion = <span class="str">"Excelente"</span>;
+} <span class="kw">else if</span> (nota >= <span class="num">80</span>) {
+    calificacion = <span class="str">"Muy Bueno"</span>;
+} <span class="kw">else if</span> (nota >= <span class="num">70</span>) {
+    calificacion = <span class="str">"Bueno"</span>;
+} <span class="kw">else if</span> (nota >= <span class="num">60</span>) {
+    calificacion = <span class="str">"Suficiente"</span>;
+} <span class="kw">else</span> {
+    calificacion = <span class="str">"Reprobado"</span>;
+}
+
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`Nota: ${nota} → ${calificacion}`</span>);
+<span class="cmt">// → Nota: 75 → Bueno</span></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Operador Ternario</span>
+      </div>
+      <pre><span class="cmt">// Sintaxis: condición ? valor_si_true : valor_si_false</span>
+<span class="kw">const</span> edad    = <span class="num">20</span>;
+<span class="kw">const</span> acceso  = edad >= <span class="num">18</span> ? <span class="str">"Permitido"</span> : <span class="str">"Denegado"</span>;
+<span class="fn">console</span>.<span class="fn">log</span>(acceso);  <span class="cmt">// → "Permitido"</span>
+
+<span class="cmt">// Ideal para asignaciones simples de una sola condición</span>
+<span class="kw">const</span> precio    = <span class="num">150</span>;
+<span class="kw">const</span> descuento = precio > <span class="num">100</span> ? precio * <span class="num">0.9</span> : precio;
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`Precio final: $${descuento}`</span>);  <span class="cmt">// → Precio final: $135</span></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — switch</span>
+      </div>
+      <pre><span class="kw">const</span> dia = <span class="str">"lunes"</span>;
+
+<span class="kw">switch</span> (dia) {
+    <span class="kw">case</span> <span class="str">"lunes"</span>:
+    <span class="kw">case</span> <span class="str">"martes"</span>:
+    <span class="kw">case</span> <span class="str">"miércoles"</span>:
+    <span class="kw">case</span> <span class="str">"jueves"</span>:
+    <span class="kw">case</span> <span class="str">"viernes"</span>:
+        <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"Día de trabajo"</span>);
+        <span class="kw">break</span>;
+    <span class="kw">case</span> <span class="str">"sábado"</span>:
+    <span class="kw">case</span> <span class="str">"domingo"</span>:
+        <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"Fin de semana"</span>);
+        <span class="kw">break</span>;
+    <span class="kw">default</span>:
+        <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"Día desconocido"</span>);
+}
+<span class="cmt">// → Día de trabajo</span></pre>
+    </div>
+
+    <!-- ── Bucles ── -->
+    <div class="section-title">Bucles (Loops)</div>
+    <div class="prose">
+      <p>Los bucles permiten <strong>repetir un bloque de código</strong> mientras se cumpla una condición, o una cantidad determinada de veces.</p>
+    </div>
+
+    <div class="subsection-title">for — cuando se conoce el número de repeticiones</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — for</span>
+      </div>
+      <pre><span class="cmt">// for (inicialización; condición; incremento)</span>
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">1</span>; i <= <span class="num">5</span>; i++) {
+    <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`Iteración ${i}`</span>);
+}
+<span class="cmt">// → Iteración 1</span>
+<span class="cmt">// → Iteración 2  ...hasta 5</span>
+
+<span class="cmt">// Recorrer un array con for clásico</span>
+<span class="kw">const</span> colores = [<span class="str">"rojo"</span>, <span class="str">"verde"</span>, <span class="str">"azul"</span>];
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < colores.<span class="fn">length</span>; i++) {
+    <span class="fn">console</span>.<span class="fn">log</span>(colores[i]);
+}
+<span class="cmt">// → rojo, verde, azul</span></pre>
+    </div>
+
+    <div class="subsection-title">for...of — recorrer arrays de forma sencilla</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — for...of</span>
+      </div>
+      <pre><span class="kw">const</span> estudiantes = [<span class="str">"Ana"</span>, <span class="str">"Luis"</span>, <span class="str">"María"</span>, <span class="str">"Carlos"</span>];
+
+<span class="kw">for</span> (<span class="kw">const</span> estudiante <span class="kw">of</span> estudiantes) {
+    <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`Bienvenido/a, ${estudiante}`</span>);
+}
+<span class="cmt">// → Bienvenido/a, Ana</span>
+<span class="cmt">// → Bienvenido/a, Luis  ...etc.</span>
+
+<span class="cmt">// Sumar todos los elementos</span>
+<span class="kw">const</span> numeros = [<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>];
+<span class="kw">let</span> total = <span class="num">0</span>;
+<span class="kw">for</span> (<span class="kw">const</span> num <span class="kw">of</span> numeros) {
+    total += num;
+}
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`Total: ${total}`</span>);  <span class="cmt">// → Total: 100</span></pre>
+    </div>
+
+    <div class="subsection-title">while — cuando no se conoce el número de repeticiones</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — while y do...while</span>
+      </div>
+      <pre><span class="cmt">// while: evalúa la condición ANTES de ejecutar</span>
+<span class="kw">let</span> intentos = <span class="num">0</span>;
+<span class="kw">while</span> (intentos < <span class="num">3</span>) {
+    <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`Intento #${intentos + 1}`</span>);
+    intentos++;
+}
+<span class="cmt">// → Intento #1, #2, #3</span>
+
+<span class="cmt">// do...while: ejecuta AL MENOS UNA VEZ antes de evaluar</span>
+<span class="kw">let</span> numero = <span class="num">10</span>;
+<span class="kw">do</span> {
+    <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`Número: ${numero}`</span>);
+    numero--;
+} <span class="kw">while</span> (numero > <span class="num">7</span>);
+<span class="cmt">// → Número: 10, Número: 9, Número: 8</span></pre>
+    </div>
+
+    <!-- ── Ejercicios demostrativos ── -->
+    <div class="exercise-demo">
+      <div class="exercise-demo-label">Ejercicios Demostrativos</div>
+
+      <h4>Ejercicio 1 — Tabla de multiplicar</h4>
+      <p>Generar la tabla de multiplicar de un número usando un bucle <code>for</code>.</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+          <span class="code-block-lang">JavaScript</span>
+        </div>
+        <pre><span class="kw">const</span> numero = <span class="num">7</span>;
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`=== Tabla del ${numero} ===`</span>);
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">1</span>; i <= <span class="num">10</span>; i++) {
+    <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`${numero} x ${i} = ${numero * i}`</span>);
+}
+<span class="cmt">// → 7 x 1 = 7</span>
+<span class="cmt">// → 7 x 2 = 14  ...hasta 7 x 10 = 70</span></pre>
+      </div>
+
+      <h4>Ejercicio 2 — Clasificar calificaciones de un grupo</h4>
+      <p>Recorrer un array de notas y clasificar cada estudiante usando condicionales dentro de un bucle.</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+          <span class="code-block-lang">JavaScript</span>
+        </div>
+        <pre><span class="kw">const</span> estudiantes = [
+    { nombre: <span class="str">"Ana"</span>,    nota: <span class="num">92</span> },
+    { nombre: <span class="str">"Luis"</span>,   nota: <span class="num">58</span> },
+    { nombre: <span class="str">"María"</span>,  nota: <span class="num">75</span> },
+    { nombre: <span class="str">"Carlos"</span>, nota: <span class="num">83</span> },
+];
+
+<span class="kw">for</span> (<span class="kw">const</span> est <span class="kw">of</span> estudiantes) {
+    <span class="kw">let</span> estado;
+    <span class="kw">if</span> (est.nota >= <span class="num">90</span>)      estado = <span class="str">"Excelente"</span>;
+    <span class="kw">else if</span> (est.nota >= <span class="num">70</span>) estado = <span class="str">"Aprobado"</span>;
+    <span class="kw">else if</span> (est.nota >= <span class="num">60</span>) estado = <span class="str">"Suficiente"</span>;
+    <span class="kw">else</span>                      estado = <span class="str">"Reprobado"</span>;
+
+    <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`${est.nombre}: ${est.nota} → ${estado}`</span>);
+}
+<span class="cmt">// → Ana: 92 → Excelente</span>
+<span class="cmt">// → Luis: 58 → Reprobado</span>
+<span class="cmt">// → María: 75 → Aprobado</span>
+<span class="cmt">// → Carlos: 83 → Aprobado</span></pre>
+      </div>
+
+      <h4>Ejercicio 3 — Encontrar el número mayor en un array</h4>
+      <p>Recorrer un array de números y encontrar el valor máximo sin usar <code>Math.max()</code>.</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+          <span class="code-block-lang">JavaScript</span>
+        </div>
+        <pre><span class="kw">const</span> numeros = [<span class="num">34</span>, <span class="num">78</span>, <span class="num">12</span>, <span class="num">91</span>, <span class="num">45</span>, <span class="num">67</span>];
+<span class="kw">let</span> mayor = numeros[<span class="num">0</span>];  <span class="cmt">// asumimos que el primero es el mayor</span>
+
+<span class="kw">for</span> (<span class="kw">const</span> num <span class="kw">of</span> numeros) {
+    <span class="kw">if</span> (num > mayor) {
+        mayor = num;       <span class="cmt">// actualizamos si encontramos uno más grande</span>
+    }
+}
+
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`El número mayor es: ${mayor}`</span>);  <span class="cmt">// → 91</span></pre>
+      </div>
+
+      <h4>Ejercicio 4 — FizzBuzz clásico</h4>
+      <p>Problema clásico de programación: imprimir números del 1 al 20, pero "Fizz" si es múltiplo de 3, "Buzz" si es de 5, y "FizzBuzz" si es de ambos.</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+          <span class="code-block-lang">JavaScript</span>
+        </div>
+        <pre><span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">1</span>; i <= <span class="num">20</span>; i++) {
+    <span class="kw">if</span> (i % <span class="num">3</span> === <span class="num">0</span> && i % <span class="num">5</span> === <span class="num">0</span>) {
+        <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"FizzBuzz"</span>);
+    } <span class="kw">else if</span> (i % <span class="num">3</span> === <span class="num">0</span>) {
+        <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"Fizz"</span>);
+    } <span class="kw">else if</span> (i % <span class="num">5</span> === <span class="num">0</span>) {
+        <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"Buzz"</span>);
+    } <span class="kw">else</span> {
+        <span class="fn">console</span>.<span class="fn">log</span>(i);
+    }
+}
+<span class="cmt">// → 1, 2, Fizz, 4, Buzz, Fizz, 7, 8, Fizz, Buzz, 11, Fizz, 13, 14, FizzBuzz...</span></pre>
+      </div>
+    </div>
+
+    <!-- ── Tarea ── -->
+    <div class="homework">
+      <div class="homework-label">Tarea — 10 Ejercicios</div>
+      <p class="hw-intro">Resuelve cada ejercicio en tu editor de código. Prueba tu solución en la consola del navegador (F12 → Console) o en Node.js.</p>
+
+      <div class="hw-item">
+        <div class="hw-item-num">Ejercicio 1 — Variables y tipos</div>
+        <p>Declara variables para almacenar: tu nombre (<code>String</code>), tu edad (<code>Number</code>), si eres estudiante (<code>Boolean</code>), y tu ciudad favorita. Usa <code>const</code> para los que no cambiarán y <code>let</code> para los que sí. Imprime todos en un único <code>console.log</code> usando un template literal.</p>
+      </div>
+
+      <div class="hw-item">
+        <div class="hw-item-num">Ejercicio 2 — Operaciones con Numbers</div>
+        <p>Dado un precio de producto (<code>const precio = 250</code>) y una cantidad (<code>let cantidad = 4</code>), calcula: el subtotal, el IVA (15%), y el total con IVA. Muestra cada resultado en pantalla con un mensaje descriptivo.</p>
+      </div>
+
+      <div class="hw-item">
+        <div class="hw-item-num">Ejercicio 3 — Operaciones con Strings</div>
+        <p>Crea una variable <code>frase = "JavaScript es el lenguaje de la web"</code>. Usando métodos de String, imprime: la cantidad de caracteres, la frase en mayúsculas, si contiene la palabra "web", y la posición donde empieza "lenguaje".</p>
+      </div>
+
+      <div class="hw-item">
+        <div class="hw-item-num">Ejercicio 4 — Condicional de IMC</div>
+        <p>Dados <code>const peso = 70</code> (kg) y <code>const altura = 1.75</code> (m), calcula el IMC (peso / altura²). Usa un <code>if/else if/else</code> para clasificar: Bajo peso (&lt;18.5), Normal (18.5–24.9), Sobrepeso (25–29.9), Obesidad (≥30). Imprime el IMC y su clasificación.</p>
+      </div>
+
+      <div class="hw-item">
+        <div class="hw-item-num">Ejercicio 5 — Array de frutas</div>
+        <p>Crea un array con 5 frutas de tu elección. Luego: agrega una fruta nueva al final, elimina la primera fruta (<code>.shift()</code>), imprime cuántas frutas quedan, y verifica si "mango" está en el array. Muestra el array final.</p>
+      </div>
+
+      <div class="hw-item">
+        <div class="hw-item-num">Ejercicio 6 — Bucle for: suma de pares</div>
+        <p>Usando un bucle <code>for</code>, recorre los números del 1 al 50 y suma únicamente los números pares. Imprime el resultado final. <em>Pista: usa el operador módulo <code>%</code> para identificar números pares.</em></p>
+      </div>
+
+      <div class="hw-item">
+        <div class="hw-item-num">Ejercicio 7 — Contar elementos en un array</div>
+        <p>Dado el array <code>const notas = [78, 55, 90, 62, 45, 88, 71, 50, 95, 63]</code>, usa un bucle <code>for...of</code> y condicionales para contar cuántos estudiantes aprobaron (nota ≥ 60) y cuántos reprobaron. Imprime ambos conteos.</p>
+      </div>
+
+      <div class="hw-item">
+        <div class="hw-item-num">Ejercicio 8 — Calculadora con switch</div>
+        <p>Declara dos números y un operador como variables (<code>const op = "+"</code>). Usa un <code>switch</code> con los casos <code>"+"</code>, <code>"-"</code>, <code>"*"</code>, <code>"/"</code> para realizar la operación correcta. Maneja el caso de división por cero y el <code>default</code> para operadores desconocidos.</p>
+      </div>
+
+      <div class="hw-item">
+        <div class="hw-item-num">Ejercicio 9 — Generador de patrón</div>
+        <p>Usando bucles anidados (<code>for</code> dentro de <code>for</code>), imprime el siguiente patrón de asteriscos en la consola:</p>
+        <div class="code-block" style="margin-top:8px;">
+          <div class="code-block-header"><div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div><span class="code-block-lang">Patrón esperado</span></div>
+          <pre>*
+**
+***
+****
+*****</pre>
+        </div>
+      </div>
+
+      <div class="hw-item">
+        <div class="hw-item-num">Ejercicio 10 — Análisis completo de un array</div>
+        <p>Dado el array <code>const temperaturas = [22, 35, 18, 29, 41, 15, 27, 33, 20, 38]</code>, sin usar funciones de orden superior (<code>Math.max</code>, <code>reduce</code>, etc.), calcula usando bucles y condicionales: la temperatura más alta, la más baja, el promedio, y cuántos días superaron los 30°C. Muestra todos los resultados con mensajes claros.</p>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<nav class="bottom-nav">
+  <button class="nav-btn prev" id="prevBtn">&#8592; Anterior</button>
+  <span class="page-counter" id="pageCounter"></span>
+  <button class="nav-btn next" id="nextBtn">Siguiente &#8594;</button>
+</nav>
+
+<script>
+  const sections = Array.from(document.querySelectorAll('.class-section'));
+  const navLinks = Array.from(document.querySelectorAll('.sidebar nav a'));
+  const mainEl   = document.querySelector('.main');
+  const prevBtn  = document.getElementById('prevBtn');
+  const nextBtn  = document.getElementById('nextBtn');
+  const counter  = document.getElementById('pageCounter');
+
+  let current = 0;
+
+  function showSection(index) {
+    if (index < 0 || index >= sections.length) return;
+
+    sections[current].classList.remove('active');
+    navLinks.forEach(a => a.classList.remove('active'));
+
+    current = index;
+    sections[current].classList.add('active');
+
+    const activeLink = document.querySelector(`.sidebar nav a[href="#${sections[current].id}"]`);
+    if (activeLink) {
+      activeLink.classList.add('active');
+      // Expand the group containing the active link
+      const group = activeLink.closest('.sidebar-group');
+      if (group) group.classList.remove('collapsed');
+    }
+
+    mainEl.scrollTo({ top: 0 });
+
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === sections.length - 1;
+    counter.innerHTML = `Clase <strong>${current + 1}</strong> de ${sections.length}`;
+  }
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const id  = link.getAttribute('href').slice(1);
+      const idx = sections.findIndex(s => s.id === id);
+      if (idx !== -1) showSection(idx);
+    });
+  });
+
+  // Collapsible sidebar groups
+  document.querySelectorAll('.sidebar-group-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const group = header.closest('.sidebar-group');
+      group.classList.toggle('collapsed');
+    });
+  });
+
+  prevBtn.addEventListener('click', () => showSection(current - 1));
+  nextBtn.addEventListener('click', () => showSection(current + 1));
+
+  showSection(0);
+</script>
+
+</body>
+</html>
