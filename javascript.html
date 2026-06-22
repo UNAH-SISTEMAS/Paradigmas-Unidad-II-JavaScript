@@ -1,0 +1,3040 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Introducción a JavaScript · Ing. Ricardo Toro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #f6efdd;
+      --bg-card:      #fbf6e8;
+      --bg-card2:     #f2e9d0;
+      --accent:       #7a2418;
+      --accent-hover: #9e3020;
+      --text:         #1a1610;
+      --text-muted:   #7a6c54;
+      --sidebar-bg:   #1a1610;
+      --sidebar-text: #c8bda4;
+      --sidebar-dim:  #7a6c54;
+      --code-bg:      #1e1a14;
+      --code-text:    #e2d5bc;
+      --border:       #d4c9a8;
+      --border-soft:  #e8dcc8;
+      --kw:  #e07b6a;
+      --str: #8fbe74;
+      --cmt: #6e6352;
+      --num: #d4a04a;
+      --fn:  #7abecd;
+      --pp:  #b08fc8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: auto; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 15px;
+      line-height: 1.65;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 264px;
+      height: 100vh;
+      background: var(--sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      z-index: 100;
+    }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-thumb { background: #3a3028; border-radius: 2px; }
+
+    .sidebar-header {
+      padding: 28px 24px 20px;
+      border-bottom: 1px solid #2e2820;
+    }
+    .sidebar-course {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 19px;
+      font-style: italic;
+      color: #e8dcc8;
+      line-height: 1.3;
+      margin-bottom: 6px;
+    }
+    .sidebar-tag {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      color: #c8bda4;
+      text-transform: uppercase;
+    }
+    .sidebar-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      font-size: 12px;
+      color: #6a6050;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .sidebar-back:hover { color: #c8bda4; }
+
+    /* Collapsible section labels */
+    .sidebar-section-label {
+      padding: 18px 24px 6px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      color: #a89e8a;
+      text-transform: uppercase;
+    }
+    .sidebar-section-label.collapsible {
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      transition: color 0.15s;
+    }
+    .sidebar-section-label.collapsible:hover { color: #c8bda4; }
+
+    .chevron {
+      display: inline-block;
+      font-size: 9px;
+      color: #5a5040;
+      margin-right: 4px;
+      transition: transform 0.22s ease;
+    }
+
+    /* Nav animation */
+    .sidebar nav {
+      overflow: hidden;
+      max-height: 600px;
+      transition: max-height 0.28s ease;
+    }
+    .sidebar nav.nav-collapsed { max-height: 0; }
+
+    .sidebar nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 24px;
+      color: var(--sidebar-text);
+      text-decoration: none;
+      font-size: 13.5px;
+      transition: background 0.15s, color 0.15s;
+      border-left: 3px solid transparent;
+    }
+    .sidebar nav a:hover {
+      background: #24201a;
+      color: #f0e8d4;
+      border-left-color: #4a3a28;
+    }
+    .sidebar nav a.active {
+      background: #2a1e18;
+      color: #f0e8d4;
+      border-left-color: var(--accent);
+    }
+    .sidebar nav a .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px; height: 22px;
+      border-radius: 5px;
+      background: #2e2820;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--sidebar-dim);
+      flex-shrink: 0;
+    }
+    .sidebar nav a.active .num {
+      background: var(--accent);
+      color: #fde8e0;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 20px 24px;
+      border-top: 1px solid #2e2820;
+      font-family: 'EB Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 13px;
+      color: #a89e8a;
+    }
+
+    /* ── Main ── */
+    .main {
+      margin-left: 264px;
+      flex: 1;
+      padding: 56px 64px 120px 64px;
+      max-width: calc(100% - 264px);
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .page-header {
+      margin-bottom: 56px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-header-tag {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3.5px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .page-header h1 {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 46px;
+      font-weight: 500;
+      font-style: italic;
+      color: var(--text);
+      line-height: 1.15;
+      margin-bottom: 12px;
+    }
+    .page-header-meta { color: var(--text-muted); font-size: 14px; }
+
+    /* ── Sections ── */
+    .class-section { display: none; }
+    .class-section.active {
+      display: block;
+      animation: fadeIn 0.22s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .class-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .class-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      width: 54px; height: 54px;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fde8e0;
+      flex-shrink: 0;
+    }
+    .class-badge-label {
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      opacity: 0.8;
+      line-height: 1;
+    }
+    .class-badge-num {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 26px;
+      font-weight: 600;
+      line-height: 1;
+    }
+    .class-title {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 32px;
+      font-weight: 500;
+      line-height: 1.2;
+      color: var(--text);
+    }
+    .class-title-sub { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+    .section-title {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--text);
+      margin: 32px 0 12px;
+    }
+    .subsection-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin: 24px 0 10px;
+    }
+
+    .objectives {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      padding: 18px 22px;
+      margin-bottom: 28px;
+    }
+    .objectives-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .objectives ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .objectives ul li { display: flex; gap: 10px; font-size: 14px; color: var(--text); }
+    .objectives ul li::before { content: '→'; color: var(--accent); font-weight: 600; flex-shrink: 0; }
+
+    .prose p { margin-bottom: 14px; color: var(--text); }
+    .prose strong { color: var(--text); font-weight: 600; }
+    .prose ul, .prose ol { padding-left: 22px; margin-bottom: 14px; }
+    .prose ul li, .prose ol li { margin-bottom: 5px; }
+
+    .code-block {
+      background: var(--code-bg);
+      border-radius: 10px;
+      margin: 18px 0;
+      overflow: hidden;
+    }
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background: #141210;
+      border-bottom: 1px solid #2a2520;
+    }
+    .code-block-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .code-block-dot:nth-child(1) { background: #6e4040; }
+    .code-block-dot:nth-child(2) { background: #6e6240; }
+    .code-block-dot:nth-child(3) { background: #3e5e3e; }
+    .code-block-lang {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: #4a4038;
+      text-transform: uppercase;
+    }
+    .code-block pre {
+      padding: 20px 22px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: var(--code-text);
+    }
+    .code-block pre::-webkit-scrollbar { height: 4px; }
+    .code-block pre::-webkit-scrollbar-thumb { background: #3a3028; border-radius: 2px; }
+
+    .kw  { color: var(--kw); }
+    .str { color: var(--str); }
+    .cmt { color: var(--cmt); font-style: italic; }
+    .num { color: var(--num); }
+    .fn  { color: var(--fn); }
+    .pp  { color: var(--pp); }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      background: var(--bg-card2);
+      color: var(--accent);
+      padding: 1px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 18px 0;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    thead tr { background: var(--bg-card2); }
+    th {
+      text-align: left;
+      padding: 10px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 10px 16px;
+      color: var(--text);
+      border-bottom: 1px solid var(--border-soft);
+      vertical-align: top;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:nth-child(even) { background: var(--bg-card); }
+    td code, th code { font-size: 12px; }
+
+    .callout {
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 18px 0;
+      font-size: 14px;
+    }
+    .callout-warn {
+      background: #fbf0e8;
+      border: 1px solid #d4a87a;
+      border-left: 4px solid #c47a2a;
+    }
+    .callout-info {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--text-muted);
+    }
+    .callout-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      color: #c47a2a;
+    }
+    .callout-info .callout-label { color: var(--text-muted); }
+
+    .activity {
+      background: #fbf6e8;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 22px 26px;
+      margin-top: 28px;
+    }
+    .activity-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    .activity h4 {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 17px;
+      font-weight: 500;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .flow-box {
+      background: var(--code-bg);
+      border-radius: 8px;
+      padding: 18px 24px;
+      margin: 16px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #b0a898;
+      line-height: 1.8;
+      white-space: pre;
+    }
+
+    .divider { display: none; }
+
+    /* ── Bottom nav ── */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 264px;
+      right: 0;
+      height: 62px;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 64px;
+      z-index: 50;
+    }
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.14s, border-color 0.14s;
+    }
+    .nav-btn:hover { background: var(--bg-card2); border-color: var(--text-muted); }
+    .nav-btn.next { background: var(--accent); border-color: var(--accent); color: #fde8e0; }
+    .nav-btn.next:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    .nav-btn:disabled { opacity: 0.28; cursor: default; pointer-events: none; }
+    .page-counter { font-size: 13px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+    .page-counter strong { color: var(--text); font-weight: 600; }
+
+    @media (max-width: 900px) {
+      .sidebar { width: 220px; }
+      .main { margin-left: 220px; max-width: calc(100% - 220px); padding: 36px 32px 100px; }
+      .bottom-nav { left: 220px; padding: 0 32px; }
+    }
+    @media (max-width: 640px) {
+      .sidebar { transform: translateX(-100%); }
+      .main { margin-left: 0; max-width: 100%; padding: 28px 20px 100px; }
+      .bottom-nav { left: 0; padding: 0 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-course">Introducción a JavaScript</div>
+    <div class="sidebar-tag">JS · Paradigma Funcional</div>
+    <a href="index.html" class="sidebar-back">&#8592; Lenguajes Multiparadigma</a>
+  </div>
+
+  <!-- Grupo 1: Introducción -->
+  <div class="sidebar-section-label collapsible" data-target="nav-intro">
+    <span>Introducción</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <nav id="nav-intro">
+    <a href="#clase1" class="active">
+      <span class="num">1</span> Historia de JavaScript
+    </a>
+    <a href="#clase2">
+      <span class="num">2</span> Variables
+    </a>
+    <a href="#clase3">
+      <span class="num">3</span> Tipos de Datos
+    </a>
+  </nav>
+
+  <!-- Grupo 2: Fundamentos -->
+  <div class="sidebar-section-label collapsible" data-target="nav-fund">
+    <span>Fundamentos</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <nav id="nav-fund">
+    <a href="#clase4">
+      <span class="num">4</span> Operadores
+    </a>
+    <a href="#clase5">
+      <span class="num">5</span> Condicionales
+    </a>
+    <a href="#clase6">
+      <span class="num">6</span> Bucles
+    </a>
+  </nav>
+
+  <!-- Grupo 3: Paradigma Funcional -->
+  <div class="sidebar-section-label collapsible" data-target="nav-func">
+    <span>Paradigma Funcional</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <nav id="nav-func">
+    <a href="#clase7">
+      <span class="num">7</span> Funciones declaradas
+    </a>
+    <a href="#clase8">
+      <span class="num">8</span> Parámetros avanzados
+    </a>
+    <a href="#clase9">
+      <span class="num">9</span> Funciones anónimas y arrow
+    </a>
+    <a href="#clase10">
+      <span class="num">10</span> Closures y scope
+    </a>
+    <a href="#clase11">
+      <span class="num">11</span> map · filter · reduce
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">Ing. Ricardo Toro &nbsp;·&nbsp; 2026</div>
+</aside>
+
+<!-- ══════════════════════════════════
+     MAIN
+══════════════════════════════════════ -->
+<main class="main">
+
+  <div class="page-header">
+    <div class="page-header-tag">Paradigmas de Programación · Unidad II</div>
+    <h1>Introducción a JavaScript</h1>
+    <div class="page-header-meta">Ing. Ricardo Toro &nbsp;·&nbsp; UNAH · 2026</div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       CLASE 1 — Historia
+  ══════════════════════════════════════ -->
+  <section class="class-section" id="clase1">
+    <div class="class-header">
+      <div class="class-badge">
+        <span class="class-badge-label">Clase</span>
+        <span class="class-badge-num">1</span>
+      </div>
+      <div>
+        <div class="class-title">Historia de JavaScript</div>
+        <div class="class-title-sub">Origen · ECMAScript · Node.js · El lenguaje más popular del mundo</div>
+      </div>
+    </div>
+
+    <div class="objectives">
+      <div class="objectives-label">Objetivos</div>
+      <ul>
+        <li>Conocer el contexto histórico que dio origen a JavaScript.</li>
+        <li>Entender la evolución del estándar ECMAScript hasta la actualidad.</li>
+        <li>Comprender por qué JavaScript domina el desarrollo web moderno.</li>
+      </ul>
+    </div>
+
+    <div class="section-title">La Web en 1993 — El Problema</div>
+    <div class="prose">
+      <p>A inicios de los 90, la World Wide Web era completamente <strong>estática</strong>: páginas HTML que solo mostraban texto e imágenes sin interacción alguna. Los formularios se enviaban al servidor para validarse, recargando toda la página ante cualquier error. <strong>Netscape Navigator</strong>, el navegador dominante, identificó la necesidad de un lenguaje que permitiera agregar comportamiento dinámico directamente en el navegador del usuario.</p>
+    </div>
+
+    <div class="section-title">Los 10 Días que Cambiaron la Web</div>
+    <div class="prose">
+      <p>Netscape contrató a <strong>Brendan Eich</strong> en abril de 1995 con una misión: crear un lenguaje de scripting para el navegador. Eich escribió el primer prototipo en <strong>solo 10 días</strong> (del 6 al 15 de mayo de 1995). El lenguaje pasó por tres nombres antes de llegar al que conocemos hoy:</p>
+    </div>
+
+    <div class="flow-box">  Mocha  ──&gt;  LiveScript  ──&gt;  JavaScript
+
+  Mayo 1995 : Brendan Eich crea "Mocha" en 10 días
+  Sep  1995 : Renombrado "LiveScript" al integrarse en Netscape Navigator 2.0 beta
+  Dic  1995 : Renombrado "JavaScript" — alianza de marketing con Sun Microsystems
+              (creadores de Java, muy popular en esa época)
+
+  ⚠  JavaScript y Java son lenguajes completamente distintos.
+     El nombre fue 100% marketing, no tiene relación técnica.</div>
+
+    <div class="section-title">La Guerra de Navegadores y el Nacimiento de ECMAScript</div>
+    <div class="prose">
+      <p>Microsoft respondió creando <strong>JScript</strong> para Internet Explorer — una implementación propia de JavaScript con diferencias sutiles que generaron años de problemas de compatibilidad. Para resolverlo, Netscape envió JavaScript a <strong>ECMA International</strong> para su estandarización en 1996.</p>
+      <p>En 1997 nació el estándar oficial: <strong>ECMAScript</strong> (abreviado ES). JavaScript es la implementación más conocida de ECMAScript. El nombre "ECMAScript" evitó conflictos de marcas registradas con Sun/Oracle.</p>
+    </div>
+
+    <div class="section-title">Evolución del Estándar — ECMAScript</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Versión</th><th>Año</th><th>Aportación clave</th></tr></thead>
+        <tbody>
+          <tr><td><strong>ES1</strong></td><td>1997</td><td>Primera versión estándar. Base del lenguaje.</td></tr>
+          <tr><td><strong>ES3</strong></td><td>1999</td><td>Expresiones regulares, try/catch, mejor manejo de strings.</td></tr>
+          <tr><td><strong>ES5</strong></td><td>2009</td><td>Modo estricto (<code>use strict</code>), JSON nativo, <code>Array.forEach</code>, <code>map</code>, <code>filter</code>.</td></tr>
+          <tr><td><strong>ES6 / ES2015</strong></td><td>2015</td><td><strong>La gran revolución:</strong> <code>let</code>/<code>const</code>, clases, arrow functions, template literals, Promises, módulos, destructuring, parámetros por defecto.</td></tr>
+          <tr><td><strong>ES2016–2018</strong></td><td>2016–2018</td><td>Operador exponente (<code>**</code>), <code>async/await</code>, <code>Object.entries</code>, rest/spread mejorado.</td></tr>
+          <tr><td><strong>ES2019–2024</strong></td><td>2019–2024</td><td>Actualizaciones anuales: <code>?.`</code> (optional chaining), <code>??</code> (nullish coalescing), <code>at()</code>, top-level await.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title">Node.js — JavaScript Conquista el Servidor (2009)</div>
+    <div class="prose">
+      <p><strong>Ryan Dahl</strong> lanzó Node.js en 2009, llevando JavaScript al lado del servidor mediante el motor <strong>V8 de Google Chrome</strong>. Esto transformó JS de lenguaje exclusivamente de front-end a un lenguaje <strong>full-stack</strong>: un mismo desarrollador puede escribir el cliente y el servidor usando el mismo lenguaje y compartiendo código entre ambos.</p>
+    </div>
+
+    <div class="section-title">JavaScript Hoy — Datos Clave</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Indicador</th><th>Dato</th></tr></thead>
+        <tbody>
+          <tr><td>Popularidad (Stack Overflow 2024)</td><td>Lenguaje #1 — <strong>12 años consecutivos</strong> como el más utilizado</td></tr>
+          <tr><td>Paquetes en npm</td><td>Más de 2.1 millones de paquetes disponibles</td></tr>
+          <tr><td>Entornos de ejecución</td><td>Navegador, servidor (Node.js), desktop (Electron), mobile (React Native), IoT</td></tr>
+          <tr><td>Frameworks principales</td><td>React, Angular, Vue (frontend) · Express, Next.js, Nest.js (backend)</td></tr>
+          <tr><td>Empresas que lo usan</td><td>Google, Meta, Netflix, Airbnb, LinkedIn, X (Twitter)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-label">Para recordar siempre</div>
+      El nombre oficial del estándar es <strong>ECMAScript</strong>. Cuando veas ES6, ES2015, ES2020 o ES2024, todos hacen referencia a versiones del mismo estándar que JavaScript implementa. En el día a día, todos dicen "JavaScript" o simplemente "JS".
+    </div>
+
+    <div class="activity">
+      <div class="activity-label">Reflexión inicial</div>
+      <h4>Antes de continuar, responde:</h4>
+      <ol style="padding-left:20px; color:var(--text); font-size:14px; line-height:2.2;">
+        <li>¿Por qué crees que crear un lenguaje en 10 días generó problemas históricos de compatibilidad?</li>
+        <li>¿Qué ventaja tiene para un equipo de desarrollo que el frontend y el backend compartan el mismo lenguaje?</li>
+        <li>¿En qué proyectos de tu carrera podrías usar JavaScript del lado del servidor con Node.js?</li>
+      </ol>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════
+       CLASE 2 — Variables
+  ══════════════════════════════════════ -->
+  <section class="class-section" id="clase2">
+    <div class="class-header">
+      <div class="class-badge">
+        <span class="class-badge-label">Clase</span>
+        <span class="class-badge-num">2</span>
+      </div>
+      <div>
+        <div class="class-title">Variables en JavaScript</div>
+        <div class="class-title-sub">var · let · const · Scope · Hoisting · Buenas prácticas</div>
+      </div>
+    </div>
+
+    <div class="objectives">
+      <div class="objectives-label">Objetivos</div>
+      <ul>
+        <li>Declarar variables con <code>var</code>, <code>let</code> y <code>const</code> correctamente.</li>
+        <li>Comprender las diferencias de scope y hoisting entre los tres.</li>
+        <li>Aplicar las convenciones de nomenclatura modernas de JavaScript.</li>
+      </ul>
+    </div>
+
+    <div class="section-title">¿Qué es una Variable?</div>
+    <div class="prose">
+      <p>Una <strong>variable</strong> es un contenedor con nombre que almacena un valor en la memoria del programa. En JavaScript las variables son <strong>de tipado dinámico</strong>: no se declara el tipo, y pueden contener distintos tipos de datos a lo largo del tiempo.</p>
+    </div>
+
+    <div class="section-title">Las Tres Formas de Declarar Variables</div>
+
+    <div class="subsection-title">var — La forma clásica (antes de ES6 — evitar)</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript</span>
+      </div>
+      <pre><span class="kw">var</span> nombre = <span class="str">"Ana"</span>;
+<span class="kw">var</span> nombre = <span class="str">"Carlos"</span>; <span class="cmt">// ✓ re-declarable — fuente de bugs</span>
+nombre     = <span class="str">"Pedro"</span>;  <span class="cmt">// ✓ reasignable</span>
+
+<span class="pp">console</span>.<span class="fn">log</span>(nombre);   <span class="cmt">// → "Pedro"</span></pre>
+    </div>
+
+    <div class="subsection-title">let — Para valores que cambian (ES6 — recomendado)</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript</span>
+      </div>
+      <pre><span class="kw">let</span> edad = <span class="num">20</span>;
+edad = <span class="num">21</span>;              <span class="cmt">// ✓ reasignable</span>
+<span class="cmt">// let edad = 22;       // ✗ SyntaxError: no se puede re-declarar</span>
+
+<span class="kw">let</span> contador = <span class="num">0</span>;
+contador++;              <span class="cmt">// ✓ incremento — equivale a contador = contador + 1</span>
+<span class="pp">console</span>.<span class="fn">log</span>(contador);  <span class="cmt">// → 1</span></pre>
+    </div>
+
+    <div class="subsection-title">const — Para valores constantes (ES6 — preferido)</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript</span>
+      </div>
+      <pre><span class="kw">const</span> PI          = <span class="num">3.14159</span>;
+<span class="kw">const</span> DIAS_SEMANA  = <span class="num">7</span>;
+<span class="kw">const</span> URL_API      = <span class="str">"https://api.ejemplo.com/v1"</span>;
+
+<span class="cmt">// PI = 3.15;           // ✗ TypeError: Assignment to constant variable</span>
+<span class="cmt">// const PI = 3;        // ✗ SyntaxError: re-declaration</span>
+
+<span class="cmt">// ¡Importante! const no hace inmutable el CONTENIDO de arrays/objetos</span>
+<span class="kw">const</span> colores = [<span class="str">"rojo"</span>, <span class="str">"verde"</span>];
+colores.<span class="fn">push</span>(<span class="str">"azul"</span>);   <span class="cmt">// ✓ se puede modificar el array interno</span>
+<span class="pp">console</span>.<span class="fn">log</span>(colores);   <span class="cmt">// → ["rojo", "verde", "azul"]</span>
+<span class="cmt">// colores = [];        // ✗ no se puede reasignar la variable</span></pre>
+    </div>
+
+    <div class="section-title">Comparativa — var vs let vs const</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Característica</th><th><code>var</code></th><th><code>let</code></th><th><code>const</code></th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Reasignable</td><td>Sí</td><td>Sí</td><td>No</td></tr>
+          <tr><td>Re-declarable</td><td>Sí</td><td>No</td><td>No</td></tr>
+          <tr><td>Scope</td><td>Función o Global</td><td>Bloque <code>{ }</code></td><td>Bloque <code>{ }</code></td></tr>
+          <tr><td>Hoisting</td><td>Sí (valor: <code>undefined</code>)</td><td>Sí (pero no usable — TDZ)</td><td>Sí (pero no usable — TDZ)</td></tr>
+          <tr><td>Recomendación</td><td>Evitar en código nuevo</td><td>Cuando el valor cambia</td><td>Primera opción siempre</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title">Hoisting — El Comportamiento "Mágico" de var</div>
+    <div class="prose">
+      <p>JavaScript <strong>eleva</strong> (hoist) las declaraciones al inicio de su scope antes de ejecutar. Con <code>var</code> la variable existe desde el inicio pero vale <code>undefined</code>. Con <code>let</code> y <code>const</code> existe una <strong>Zona Temporal Muerta (TDZ)</strong> donde accederla lanza un <code>ReferenceError</code>.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Hoisting</span>
+      </div>
+      <pre><span class="cmt">// var — existe antes de declararse, pero vale undefined</span>
+<span class="pp">console</span>.<span class="fn">log</span>(saludo); <span class="cmt">// → undefined  (no lanza error)</span>
+<span class="kw">var</span> saludo = <span class="str">"Hola"</span>;
+<span class="pp">console</span>.<span class="fn">log</span>(saludo); <span class="cmt">// → "Hola"</span>
+
+<span class="cmt">// let/const — Zona Temporal Muerta: lanza ReferenceError</span>
+<span class="cmt">// console.log(nombre); // ✗ ReferenceError: Cannot access before init</span>
+<span class="kw">let</span> nombre = <span class="str">"Ana"</span>;
+<span class="pp">console</span>.<span class="fn">log</span>(nombre);  <span class="cmt">// → "Ana"</span></pre>
+    </div>
+
+    <div class="section-title">Scope — Dónde Vive una Variable</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Block scope</span>
+      </div>
+      <pre><span class="cmt">// let / const: scope de bloque — viven solo dentro de { }</span>
+{
+  <span class="kw">let</span>   dentroLet   = <span class="str">"solo aquí"</span>;
+  <span class="kw">const</span> dentroConst = <span class="num">42</span>;
+  <span class="pp">console</span>.<span class="fn">log</span>(dentroLet);   <span class="cmt">// ✓ → "solo aquí"</span>
+}
+<span class="cmt">// console.log(dentroLet);  // ✗ ReferenceError: dentroLet is not defined</span>
+
+<span class="cmt">// var: ignora el bloque — scope de función / global</span>
+{
+  <span class="kw">var</span> escapo = <span class="str">"estoy en todos lados"</span>;
+}
+<span class="pp">console</span>.<span class="fn">log</span>(escapo);        <span class="cmt">// ✓ → "estoy en todos lados"  (var escapó)</span>
+
+<span class="cmt">// Ejemplo práctico — scope en un bucle</span>
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i &lt; <span class="num">3</span>; i++) {
+  <span class="pp">console</span>.<span class="fn">log</span>(i);             <span class="cmt">// → 0, 1, 2</span>
+}
+<span class="cmt">// console.log(i);             // ✗ ReferenceError: i is not defined</span></pre>
+    </div>
+
+    <div class="section-title">Reglas para Nombrar Variables</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Regla</th><th>Correcto ✓</th><th>Incorrecto ✗</th></tr></thead>
+        <tbody>
+          <tr><td>Usar camelCase</td><td><code>nombreCompleto</code>, <code>totalVentas</code></td><td><code>nombre_completo</code>, <code>NombreCompleto</code></td></tr>
+          <tr><td>No iniciar con número</td><td><code>nota1</code>, <code>item2</code></td><td><code>1nota</code>, <code>2item</code></td></tr>
+          <tr><td>Solo letras, dígitos, <code>_</code>, <code>$</code></td><td><code>_privado</code>, <code>$elemento</code></td><td><code>mi-variable</code>, <code>mi variable</code></td></tr>
+          <tr><td>No usar palabras reservadas</td><td><code>miClass</code>, <code>elReturn</code></td><td><code>class</code>, <code>return</code>, <code>let</code></td></tr>
+          <tr><td>Nombres descriptivos</td><td><code>precioUnitario</code>, <code>esMayorDeEdad</code></td><td><code>p</code>, <code>x</code>, <code>temp</code></td></tr>
+          <tr><td>CONSTANTES en UPPER_SNAKE</td><td><code>MAX_INTENTOS</code>, <code>URL_BASE</code></td><td><code>maxIntentos</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-warn">
+      <div class="callout-label">Regla de oro</div>
+      Usa <strong><code>const</code> por defecto</strong>. Cambia a <code>let</code> únicamente cuando el valor necesita reasignarse (contadores, acumuladores). <strong>Evita <code>var</code></strong> en todo código nuevo — su hoisting y scope global han causado bugs históricos en millones de aplicaciones.
+    </div>
+
+    <div class="activity">
+      <div class="activity-label">Ejercicio de análisis</div>
+      <h4>¿Qué declaración usarías en cada caso?</h4>
+      <div class="table-wrap" style="margin-top:12px;">
+        <table>
+          <thead><tr><th>Situación</th><th>¿var / let / const?</th><th>¿Por qué?</th></tr></thead>
+          <tbody>
+            <tr><td>El valor de PI = 3.14159…</td><td></td><td></td></tr>
+            <tr><td>El contador de un bucle for</td><td></td><td></td></tr>
+            <tr><td>La URL base de una API</td><td></td><td></td></tr>
+            <tr><td>El promedio de notas calculado</td><td></td><td></td></tr>
+            <tr><td>La lista de estudiantes inscritos</td><td></td><td></td></tr>
+            <tr><td>El número de intentos fallidos de login</td><td></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════
+       CLASE 3 — Tipos de Datos
+  ══════════════════════════════════════ -->
+  <section class="class-section" id="clase3">
+    <div class="class-header">
+      <div class="class-badge">
+        <span class="class-badge-label">Clase</span>
+        <span class="class-badge-num">3</span>
+      </div>
+      <div>
+        <div class="class-title">Tipos de Datos</div>
+        <div class="class-title-sub">String · Number · Boolean · Null · Undefined · Array · typeof</div>
+      </div>
+    </div>
+
+    <div class="objectives">
+      <div class="objectives-label">Objetivos</div>
+      <ul>
+        <li>Identificar y usar los tipos de datos primitivos de JavaScript.</li>
+        <li>Manejar Strings con sus métodos más importantes.</li>
+        <li>Comprender la diferencia semántica entre <code>null</code> y <code>undefined</code>.</li>
+        <li>Crear y manipular Arrays con sus métodos básicos.</li>
+        <li>Usar <code>typeof</code> para inspeccionar tipos en tiempo de ejecución.</li>
+      </ul>
+    </div>
+
+    <div class="prose">
+      <p>JavaScript tiene <strong>tipos primitivos</strong> (inmutables, se copian por valor) y <strong>tipos de referencia</strong> (se copian por referencia). Los primitivos son: <code>string</code>, <code>number</code>, <code>boolean</code>, <code>null</code>, <code>undefined</code>, <code>bigint</code> y <code>symbol</code>. Los tipos de referencia incluyen arrays, objetos y funciones.</p>
+    </div>
+
+    <!-- STRING -->
+    <div class="section-title">String — Cadenas de Texto</div>
+    <div class="prose">
+      <p>Un <strong>string</strong> es una secuencia de caracteres Unicode. Se puede crear con comilla simple, doble, o <strong>template literals</strong> (backtick ` ` ), siendo estos últimos los más potentes al permitir interpolación de variables y expresiones.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Crear y usar strings</span>
+      </div>
+      <pre><span class="cmt">// Las tres formas de crear un string</span>
+<span class="kw">const</span> a = <span class="str">'Hola Mundo'</span>;           <span class="cmt">// comilla simple</span>
+<span class="kw">const</span> b = <span class="str">"Hola Mundo"</span>;           <span class="cmt">// comilla doble</span>
+<span class="kw">const</span> c = <span class="str">`Hola Mundo`</span>;           <span class="cmt">// template literal (ES6)</span>
+
+<span class="cmt">// Template literals — interpolación</span>
+<span class="kw">const</span> nombre = <span class="str">"Ricardo"</span>;
+<span class="kw">const</span> edad   = <span class="num">30</span>;
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="str">`Soy ${nombre} y tengo ${edad} años.`</span>);
+<span class="cmt">// → Soy Ricardo y tengo 30 años.</span>
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="str">`El doble de ${edad} es ${edad * <span class="num">2</span>}.`</span>);
+<span class="cmt">// → El doble de 30 es 60.</span>
+
+<span class="cmt">// Strings multilinea</span>
+<span class="kw">const</span> parrafo = <span class="str">`Primera línea
+Segunda línea
+Tercera línea`</span>;
+<span class="pp">console</span>.<span class="fn">log</span>(parrafo);</pre>
+    </div>
+
+    <div class="subsection-title">Métodos esenciales de String</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — String methods</span>
+      </div>
+      <pre><span class="kw">const</span> texto = <span class="str">"JavaScript"</span>;
+
+<span class="pp">console</span>.<span class="fn">log</span>(texto.length);               <span class="cmt">// → 10</span>
+<span class="pp">console</span>.<span class="fn">log</span>(texto.<span class="fn">toUpperCase</span>());        <span class="cmt">// → "JAVASCRIPT"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(texto.<span class="fn">toLowerCase</span>());        <span class="cmt">// → "javascript"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(texto.<span class="fn">includes</span>(<span class="str">"Script"</span>));   <span class="cmt">// → true</span>
+<span class="pp">console</span>.<span class="fn">log</span>(texto.<span class="fn">startsWith</span>(<span class="str">"Java"</span>));   <span class="cmt">// → true</span>
+<span class="pp">console</span>.<span class="fn">log</span>(texto.<span class="fn">endsWith</span>(<span class="str">"Script"</span>));   <span class="cmt">// → true</span>
+<span class="pp">console</span>.<span class="fn">log</span>(texto.<span class="fn">indexOf</span>(<span class="str">"S"</span>));          <span class="cmt">// → 4  (primera "S")</span>
+<span class="pp">console</span>.<span class="fn">log</span>(texto.<span class="fn">slice</span>(<span class="num">0</span>, <span class="num">4</span>));           <span class="cmt">// → "Java"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(texto.<span class="fn">slice</span>(<span class="num">4</span>));              <span class="cmt">// → "Script"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(texto.<span class="fn">replace</span>(<span class="str">"Java"</span>, <span class="str">"Type"</span>));<span class="cmt">// → "TypeScript"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(texto.<span class="fn">repeat</span>(<span class="num">2</span>));             <span class="cmt">// → "JavaScriptJavaScript"</span>
+
+<span class="cmt">// split — convierte string en array</span>
+<span class="kw">const</span> csv = <span class="str">"Ana,Carlos,María,Pedro"</span>;
+<span class="pp">console</span>.<span class="fn">log</span>(csv.<span class="fn">split</span>(<span class="str">","</span>)); <span class="cmt">// → ["Ana", "Carlos", "María", "Pedro"]</span>
+
+<span class="cmt">// trim — elimina espacios al inicio y al final</span>
+<span class="kw">const</span> sucio = <span class="str">"   Hola Mundo   "</span>;
+<span class="pp">console</span>.<span class="fn">log</span>(sucio.<span class="fn">trim</span>());   <span class="cmt">// → "Hola Mundo"</span></pre>
+    </div>
+
+    <!-- NUMBER -->
+    <div class="section-title">Number — Números</div>
+    <div class="prose">
+      <p>JavaScript tiene <strong>un solo tipo numérico</strong>: <code>number</code>, que representa tanto enteros como decimales usando el estándar IEEE 754 de doble precisión (64 bits). No existe un tipo separado para enteros.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Numbers</span>
+      </div>
+      <pre><span class="kw">const</span> entero   = <span class="num">42</span>;
+<span class="kw">const</span> decimal  = <span class="num">3.14</span>;
+<span class="kw">const</span> negativo = -<span class="num">100</span>;
+
+<span class="cmt">// Valores especiales del tipo number</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="num">10</span> / <span class="num">0</span>);          <span class="cmt">// → Infinity</span>
+<span class="pp">console</span>.<span class="fn">log</span>(-<span class="num">10</span> / <span class="num">0</span>);         <span class="cmt">// → -Infinity</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"abc"</span> * <span class="num">5</span>);       <span class="cmt">// → NaN  (Not a Number)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">typeof</span> <span class="pp">NaN</span>);      <span class="cmt">// → "number"  (NaN es de tipo number — bug histórico)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">isNaN</span>(<span class="str">"abc"</span>));    <span class="cmt">// → true</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="pp">Number</span>.<span class="fn">isNaN</span>(<span class="pp">NaN</span>));<span class="cmt">// → true  (más preciso que isNaN)</span>
+
+<span class="cmt">// Conversión a número</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">parseInt</span>(<span class="str">"42px"</span>));    <span class="cmt">// → 42  (ignora lo que no es número)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">parseFloat</span>(<span class="str">"3.14m"</span>)); <span class="cmt">// → 3.14</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">Number</span>(<span class="str">"99"</span>));         <span class="cmt">// → 99</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">Number</span>(<span class="str">"abc"</span>));        <span class="cmt">// → NaN</span>
+
+<span class="cmt">// Formatear decimales</span>
+<span class="kw">const</span> precio = <span class="num">19.9875</span>;
+<span class="pp">console</span>.<span class="fn">log</span>(precio.<span class="fn">toFixed</span>(<span class="num">2</span>));    <span class="cmt">// → "20.00"  (devuelve string)</span></pre>
+    </div>
+
+    <div class="subsection-title">El Objeto Math</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Math</span>
+      </div>
+      <pre><span class="pp">console</span>.<span class="fn">log</span>(<span class="pp">Math</span>.<span class="fn">round</span>(<span class="num">4.6</span>));     <span class="cmt">// → 5   (redondeo normal)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="pp">Math</span>.<span class="fn">floor</span>(<span class="num">4.9</span>));     <span class="cmt">// → 4   (hacia abajo)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="pp">Math</span>.<span class="fn">ceil</span>(<span class="num">4.1</span>));      <span class="cmt">// → 5   (hacia arriba)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="pp">Math</span>.<span class="fn">abs</span>(-<span class="num">15</span>));       <span class="cmt">// → 15  (valor absoluto)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="pp">Math</span>.<span class="fn">max</span>(<span class="num">3</span>, <span class="num">7</span>, <span class="num">2</span>));   <span class="cmt">// → 7   (máximo)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="pp">Math</span>.<span class="fn">min</span>(<span class="num">3</span>, <span class="num">7</span>, <span class="num">2</span>));   <span class="cmt">// → 2   (mínimo)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="pp">Math</span>.<span class="fn">pow</span>(<span class="num">2</span>, <span class="num">8</span>));      <span class="cmt">// → 256 (potencia — igual que 2**8)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="pp">Math</span>.<span class="fn">sqrt</span>(<span class="num">25</span>));       <span class="cmt">// → 5   (raíz cuadrada)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="pp">Math</span>.<span class="fn">PI</span>);              <span class="cmt">// → 3.141592653589793</span>
+
+<span class="cmt">// Número entero aleatorio entre min y max (inclusive)</span>
+<span class="kw">const</span> <span class="fn">randomInt</span> = (min, max) =&gt;
+  <span class="pp">Math</span>.<span class="fn">floor</span>(<span class="pp">Math</span>.<span class="fn">random</span>() * (max - min + <span class="num">1</span>)) + min;
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">randomInt</span>(<span class="num">1</span>, <span class="num">6</span>));     <span class="cmt">// → número del 1 al 6 (como un dado)</span></pre>
+    </div>
+
+    <!-- BOOLEAN -->
+    <div class="section-title">Boolean — Verdadero o Falso</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Boolean y Truthy / Falsy</span>
+      </div>
+      <pre><span class="kw">const</span> activo   = <span class="kw">true</span>;
+<span class="kw">const</span> inactivo = <span class="kw">false</span>;
+
+<span class="cmt">// Comparaciones → booleano</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="num">10</span> &gt; <span class="num">5</span>);            <span class="cmt">// → true</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Ana"</span> === <span class="str">"Ana"</span>);    <span class="cmt">// → true</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="num">10</span> === <span class="str">"10"</span>);        <span class="cmt">// → false (tipos distintos)</span>
+
+<span class="cmt">// Valores FALSY — actúan como false en condiciones</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">Boolean</span>(<span class="kw">false</span>));      <span class="cmt">// → false</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">Boolean</span>(<span class="num">0</span>));          <span class="cmt">// → false</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">Boolean</span>(<span class="str">""</span>));          <span class="cmt">// → false  (string vacío)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">Boolean</span>(<span class="kw">null</span>));       <span class="cmt">// → false</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">Boolean</span>(<span class="kw">undefined</span>));  <span class="cmt">// → false</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">Boolean</span>(<span class="pp">NaN</span>));        <span class="cmt">// → false</span>
+
+<span class="cmt">// Todo lo demás es TRUTHY</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">Boolean</span>(<span class="num">1</span>));           <span class="cmt">// → true</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">Boolean</span>(<span class="str">"texto"</span>));     <span class="cmt">// → true</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">Boolean</span>([]));          <span class="cmt">// → true  (array vacío es truthy)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">Boolean</span>({}));          <span class="cmt">// → true  (objeto vacío es truthy)</span></pre>
+    </div>
+
+    <!-- NULL / UNDEFINED -->
+    <div class="section-title">Null y Undefined — La Ausencia de Valor</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — null vs undefined</span>
+      </div>
+      <pre><span class="cmt">// undefined — JS lo asigna automáticamente: variable sin valor</span>
+<span class="kw">let</span> sinValor;
+<span class="pp">console</span>.<span class="fn">log</span>(sinValor);            <span class="cmt">// → undefined</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">typeof</span> sinValor);     <span class="cmt">// → "undefined"</span>
+
+<span class="cmt">// null — ausencia de valor INTENCIONAL (el programador lo asigna)</span>
+<span class="kw">let</span> usuarioActivo = <span class="kw">null</span>;         <span class="cmt">// "aún no hay usuario logueado"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(usuarioActivo);       <span class="cmt">// → null</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">typeof</span> usuarioActivo); <span class="cmt">// → "object"  (bug histórico famoso)</span>
+
+<span class="cmt">// Comparación entre null y undefined</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">null</span> == <span class="kw">undefined</span>);   <span class="cmt">// → true  (igualdad débil)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">null</span> === <span class="kw">undefined</span>);  <span class="cmt">// → false (igualdad estricta)</span></pre>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Aspecto</th><th><code>undefined</code></th><th><code>null</code></th></tr></thead>
+        <tbody>
+          <tr><td>¿Quién lo asigna?</td><td>JavaScript automáticamente</td><td>El programador — de forma deliberada</td></tr>
+          <tr><td>Significado</td><td>Declarada pero no inicializada</td><td>Ausencia intencional de valor</td></tr>
+          <tr><td><code>typeof</code></td><td><code>"undefined"</code></td><td><code>"object"</code> (bug histórico)</td></tr>
+          <tr><td>Uso típico</td><td>Raramente asignado manualmente</td><td>Resetear: <code>sesion = null</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ARRAY -->
+    <div class="section-title">Array — Listas Ordenadas</div>
+    <div class="prose">
+      <p>Un <strong>array</strong> es una colección ordenada de valores, accesibles por índice numérico comenzando en <code>0</code>. En JavaScript los arrays son dinámicos, pueden cambiar de tamaño, y pueden mezclar tipos de datos.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Crear y acceder a arrays</span>
+      </div>
+      <pre><span class="cmt">// Creación</span>
+<span class="kw">const</span> frutas  = [<span class="str">"manzana"</span>, <span class="str">"pera"</span>, <span class="str">"naranja"</span>];
+<span class="kw">const</span> numeros = [<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>, <span class="num">50</span>];
+<span class="kw">const</span> mixto   = [<span class="num">42</span>, <span class="str">"texto"</span>, <span class="kw">true</span>, <span class="kw">null</span>];
+
+<span class="cmt">// Acceso por índice (empieza en 0)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(frutas[<span class="num">0</span>]);                  <span class="cmt">// → "manzana"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(frutas[<span class="num">2</span>]);                  <span class="cmt">// → "naranja"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(frutas[frutas.length - <span class="num">1</span>]);  <span class="cmt">// → último elemento</span>
+<span class="pp">console</span>.<span class="fn">log</span>(frutas.length);              <span class="cmt">// → 3</span>
+
+<span class="cmt">// Modificar un elemento</span>
+frutas[<span class="num">1</span>] = <span class="str">"uva"</span>;
+<span class="pp">console</span>.<span class="fn">log</span>(frutas); <span class="cmt">// → ["manzana", "uva", "naranja"]</span></pre>
+    </div>
+
+    <div class="subsection-title">Métodos esenciales de Array</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Array methods básicos</span>
+      </div>
+      <pre><span class="kw">const</span> lista = [<span class="str">"rojo"</span>, <span class="str">"verde"</span>];
+
+<span class="cmt">// Agregar elementos</span>
+lista.<span class="fn">push</span>(<span class="str">"azul"</span>);       <span class="cmt">// al final    → ["rojo","verde","azul"]</span>
+lista.<span class="fn">unshift</span>(<span class="str">"blanco"</span>); <span class="cmt">// al inicio   → ["blanco","rojo","verde","azul"]</span>
+
+<span class="cmt">// Eliminar elementos</span>
+lista.<span class="fn">pop</span>();              <span class="cmt">// quita el último   — devuelve "azul"</span>
+lista.<span class="fn">shift</span>();            <span class="cmt">// quita el primero  — devuelve "blanco"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(lista);       <span class="cmt">// → ["rojo", "verde"]</span>
+
+<span class="cmt">// Buscar</span>
+<span class="pp">console</span>.<span class="fn">log</span>(lista.<span class="fn">includes</span>(<span class="str">"rojo"</span>));   <span class="cmt">// → true</span>
+<span class="pp">console</span>.<span class="fn">log</span>(lista.<span class="fn">indexOf</span>(<span class="str">"verde"</span>));   <span class="cmt">// → 1</span>
+
+<span class="cmt">// Porciones (no modifica el original)</span>
+<span class="kw">const</span> nums = [<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>, <span class="num">50</span>];
+<span class="pp">console</span>.<span class="fn">log</span>(nums.<span class="fn">slice</span>(<span class="num">1</span>, <span class="num">3</span>));        <span class="cmt">// → [20, 30]</span>
+
+<span class="cmt">// Unir en string</span>
+<span class="pp">console</span>.<span class="fn">log</span>(lista.<span class="fn">join</span>(<span class="str">" | "</span>));       <span class="cmt">// → "rojo | verde"</span>
+
+<span class="cmt">// Invertir (modifica el original)</span>
+<span class="pp">console</span>.<span class="fn">log</span>([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>].<span class="fn">reverse</span>());     <span class="cmt">// → [3, 2, 1]</span>
+
+<span class="cmt">// Spread — expandir array</span>
+<span class="kw">const</span> a = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>], b = [<span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>];
+<span class="kw">const</span> combinado = [...a, ...b];
+<span class="pp">console</span>.<span class="fn">log</span>(combinado);              <span class="cmt">// → [1, 2, 3, 4, 5, 6]</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="pp">Math</span>.<span class="fn">max</span>(...nums));       <span class="cmt">// → 50</span></pre>
+    </div>
+
+    <!-- TYPEOF -->
+    <div class="section-title">El Operador typeof</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — typeof</span>
+      </div>
+      <pre><span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">typeof</span> <span class="str">"Hola"</span>);         <span class="cmt">// → "string"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">typeof</span> <span class="num">42</span>);             <span class="cmt">// → "number"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">typeof</span> <span class="num">3.14</span>);           <span class="cmt">// → "number"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">typeof</span> <span class="kw">true</span>);           <span class="cmt">// → "boolean"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">typeof</span> <span class="kw">undefined</span>);      <span class="cmt">// → "undefined"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">typeof</span> <span class="kw">null</span>);           <span class="cmt">// → "object"   ← bug histórico</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">typeof</span> []);              <span class="cmt">// → "object"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">typeof</span> {});              <span class="cmt">// → "object"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">typeof</span> <span class="kw">function</span>(){});   <span class="cmt">// → "function"</span>
+
+<span class="cmt">// Para verificar si algo es un array, usar:</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="pp">Array</span>.<span class="fn">isArray</span>([]));     <span class="cmt">// → true  (typeof [] da "object", no sirve)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="pp">Array</span>.<span class="fn">isArray</span>(<span class="str">"hola"</span>)); <span class="cmt">// → false</span></pre>
+    </div>
+
+    <div class="section-title">Resumen — Tipos de Datos</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Tipo</th><th>Ejemplo</th><th><code>typeof</code></th><th>Categoría</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>string</code></td><td><code>"Hola"</code>, <code>'JS'</code>, <code>`texto`</code></td><td><code>"string"</code></td><td>Primitivo</td></tr>
+          <tr><td><code>number</code></td><td><code>42</code>, <code>3.14</code>, <code>NaN</code>, <code>Infinity</code></td><td><code>"number"</code></td><td>Primitivo</td></tr>
+          <tr><td><code>boolean</code></td><td><code>true</code>, <code>false</code></td><td><code>"boolean"</code></td><td>Primitivo</td></tr>
+          <tr><td><code>undefined</code></td><td><code>undefined</code></td><td><code>"undefined"</code></td><td>Primitivo</td></tr>
+          <tr><td><code>null</code></td><td><code>null</code></td><td><code>"object"</code> ⚠</td><td>Primitivo</td></tr>
+          <tr><td><code>array</code></td><td><code>[1, 2, 3]</code>, <code>[]</code></td><td><code>"object"</code></td><td>Referencia</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="activity">
+      <div class="activity-label">Ejercicio práctico</div>
+      <h4>Predice la salida de cada línea antes de ejecutarla:</h4>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+          <span class="code-block-lang">JavaScript — ¿Cuál es la salida?</span>
+        </div>
+        <pre><span class="kw">const</span> notas = [<span class="num">75</span>, <span class="num">88</span>, <span class="num">92</span>, <span class="num">60</span>, <span class="num">45</span>];
+
+<span class="pp">console</span>.<span class="fn">log</span>(notas.length);                   <span class="cmt">// ?</span>
+<span class="pp">console</span>.<span class="fn">log</span>(notas[<span class="num">0</span>] + notas[notas.length - <span class="num">1</span>]); <span class="cmt">// ?</span>
+<span class="pp">console</span>.<span class="fn">log</span>(notas.<span class="fn">includes</span>(<span class="num">100</span>));            <span class="cmt">// ?</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="pp">Math</span>.<span class="fn">max</span>(...notas));             <span class="cmt">// ?</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="pp">Math</span>.<span class="fn">min</span>(...notas));             <span class="cmt">// ?</span>
+
+<span class="kw">const</span> nombre = <span class="str">"UNAH"</span>;
+<span class="pp">console</span>.<span class="fn">log</span>(nombre.<span class="fn">toLowerCase</span>());           <span class="cmt">// ?</span>
+<span class="pp">console</span>.<span class="fn">log</span>(nombre.<span class="fn">split</span>(<span class="str">""</span>));               <span class="cmt">// ?</span>
+<span class="pp">console</span>.<span class="fn">log</span>(nombre.<span class="fn">includes</span>(<span class="str">"NA"</span>));          <span class="cmt">// ?</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">typeof</span> notas);                   <span class="cmt">// ?</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="pp">Array</span>.<span class="fn">isArray</span>(notas));           <span class="cmt">// ?</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════
+       CLASE 4 — Operadores
+  ══════════════════════════════════════ -->
+  <section class="class-section" id="clase4">
+    <div class="class-header">
+      <div class="class-badge">
+        <span class="class-badge-label">Clase</span>
+        <span class="class-badge-num">4</span>
+      </div>
+      <div>
+        <div class="class-title">Operadores</div>
+        <div class="class-title-sub">Aritméticos · Asignación · Comparación · Lógicos · Ternario</div>
+      </div>
+    </div>
+
+    <div class="objectives">
+      <div class="objectives-label">Objetivos</div>
+      <ul>
+        <li>Aplicar operadores aritméticos y de asignación en expresiones.</li>
+        <li>Distinguir entre igualdad débil (<code>==</code>) y estricta (<code>===</code>).</li>
+        <li>Combinar operadores lógicos para construir condiciones complejas.</li>
+        <li>Usar el operador ternario como alternativa concisa al if/else.</li>
+      </ul>
+    </div>
+
+    <!-- ARITMÉTICOS -->
+    <div class="section-title">Operadores Aritméticos</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Aritméticos</span>
+      </div>
+      <pre><span class="kw">const</span> a = <span class="num">10</span>, b = <span class="num">3</span>;
+
+<span class="pp">console</span>.<span class="fn">log</span>(a + b);   <span class="cmt">// → 13   suma</span>
+<span class="pp">console</span>.<span class="fn">log</span>(a - b);   <span class="cmt">// → 7    resta</span>
+<span class="pp">console</span>.<span class="fn">log</span>(a * b);   <span class="cmt">// → 30   multiplicación</span>
+<span class="pp">console</span>.<span class="fn">log</span>(a / b);   <span class="cmt">// → 3.333…  división</span>
+<span class="pp">console</span>.<span class="fn">log</span>(a % b);   <span class="cmt">// → 1    módulo (residuo)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(a ** b);  <span class="cmt">// → 1000  potencia (ES2016)</span>
+
+<span class="cmt">// Incremento / Decremento</span>
+<span class="kw">let</span> x = <span class="num">5</span>;
+x++;                  <span class="cmt">// post-incremento: usa x, luego suma 1 → x = 6</span>
+++x;                  <span class="cmt">// pre-incremento:  suma 1, luego usa  → x = 7</span>
+x--;                  <span class="cmt">// post-decremento: usa x, luego resta 1 → x = 6</span>
+<span class="pp">console</span>.<span class="fn">log</span>(x);      <span class="cmt">// → 6</span>
+
+<span class="cmt">// Concatenación — + con strings</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Nota: "</span> + <span class="num">85</span>);         <span class="cmt">// → "Nota: 85"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"5"</span> + <span class="num">3</span>);              <span class="cmt">// → "53"   (string gana)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"5"</span> - <span class="num">3</span>);              <span class="cmt">// → 2     (- no concatena)</span></pre>
+    </div>
+
+    <div class="subsection-title">Precedencia de Operadores</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript</span>
+      </div>
+      <pre><span class="cmt">// Misma precedencia que álgebra: ** > * / % > + -</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="num">2</span> + <span class="num">3</span> * <span class="num">4</span>);       <span class="cmt">// → 14  (primero 3*4=12, luego 2+12)</span>
+<span class="pp">console</span>.<span class="fn">log</span>((<span class="num">2</span> + <span class="num">3</span>) * <span class="num">4</span>);     <span class="cmt">// → 20  (paréntesis primero)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="num">2</span> ** <span class="num">3</span> ** <span class="num">2</span>);     <span class="cmt">// → 512 (** asocia de derecha: 3**2=9, 2**9)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="num">17</span> % <span class="num">5</span>);           <span class="cmt">// → 2   útil para saber si un número es par/impar</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="num">18</span> % <span class="num">2</span> === <span class="num">0</span>);     <span class="cmt">// → true  (18 es par)</span></pre>
+    </div>
+
+    <!-- ASIGNACIÓN -->
+    <div class="section-title">Operadores de Asignación</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Operador</th><th>Equivalente a</th><th>Ejemplo</th><th>Resultado (x=10)</th></tr></thead>
+        <tbody>
+          <tr><td><code>x = 5</code></td><td>asignación simple</td><td><code>x = 5</code></td><td>x → 5</td></tr>
+          <tr><td><code>x += 3</code></td><td><code>x = x + 3</code></td><td><code>x += 3</code></td><td>x → 13</td></tr>
+          <tr><td><code>x -= 3</code></td><td><code>x = x - 3</code></td><td><code>x -= 3</code></td><td>x → 7</td></tr>
+          <tr><td><code>x *= 2</code></td><td><code>x = x * 2</code></td><td><code>x *= 2</code></td><td>x → 20</td></tr>
+          <tr><td><code>x /= 4</code></td><td><code>x = x / 4</code></td><td><code>x /= 4</code></td><td>x → 2.5</td></tr>
+          <tr><td><code>x %= 3</code></td><td><code>x = x % 3</code></td><td><code>x %= 3</code></td><td>x → 1</td></tr>
+          <tr><td><code>x **= 2</code></td><td><code>x = x ** 2</code></td><td><code>x **= 2</code></td><td>x → 100</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- COMPARACIÓN -->
+    <div class="section-title">Operadores de Comparación</div>
+    <div class="callout callout-warn">
+      <div class="callout-label">Regla fundamental en JavaScript</div>
+      Siempre usa <strong><code>===</code></strong> (igualdad estricta) en lugar de <strong><code>==</code></strong> (igualdad débil). La igualdad débil realiza conversión de tipos automática y produce resultados sorpresivos que han causado incontables bugs.
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Comparación</span>
+      </div>
+      <pre><span class="cmt">// Igualdad DÉBIL (==) — convierte tipos antes de comparar</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="num">5</span> == <span class="str">"5"</span>);       <span class="cmt">// → true  ⚠ convierte "5" a número</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="num">0</span> == <span class="kw">false</span>);      <span class="cmt">// → true  ⚠</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="str">""</span> == <span class="kw">false</span>);     <span class="cmt">// → true  ⚠</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">null</span> == <span class="kw">undefined</span>);<span class="cmt">// → true  ⚠</span>
+
+<span class="cmt">// Igualdad ESTRICTA (===) — compara valor Y tipo</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="num">5</span> === <span class="num">5</span>);          <span class="cmt">// → true  ✓</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="num">5</span> === <span class="str">"5"</span>);        <span class="cmt">// → false ✓ (tipos distintos)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">null</span> === <span class="kw">undefined</span>);<span class="cmt">// → false ✓</span>
+
+<span class="cmt">// Desigualdad</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="num">5</span> != <span class="str">"5"</span>);         <span class="cmt">// → false (débil — iguales para ==)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="num">5</span> !== <span class="str">"5"</span>);        <span class="cmt">// → true  (estricta — son distintos)</span>
+
+<span class="cmt">// Mayor, menor</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="num">10</span> &gt; <span class="num">5</span>);            <span class="cmt">// → true</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="num">10</span> &gt;= <span class="num">10</span>);          <span class="cmt">// → true</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="num">3</span> &lt; <span class="num">7</span>);             <span class="cmt">// → true</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="num">3</span> &lt;= <span class="num">2</span>);            <span class="cmt">// → false</span></pre>
+    </div>
+
+    <!-- LÓGICOS -->
+    <div class="section-title">Operadores Lógicos</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Lógicos</span>
+      </div>
+      <pre><span class="cmt">// && (AND) — verdadero si AMBOS son verdaderos</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">true</span>  &amp;&amp; <span class="kw">true</span>);    <span class="cmt">// → true</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">true</span>  &amp;&amp; <span class="kw">false</span>);   <span class="cmt">// → false</span>
+
+<span class="kw">const</span> edad = <span class="num">20</span>, tieneId = <span class="kw">true</span>;
+<span class="pp">console</span>.<span class="fn">log</span>(edad &gt;= <span class="num">18</span> &amp;&amp; tieneId);  <span class="cmt">// → true  (puede ingresar)</span>
+
+<span class="cmt">// || (OR)  — verdadero si AL MENOS UNO es verdadero</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">false</span> || <span class="kw">true</span>);     <span class="cmt">// → true</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">false</span> || <span class="kw">false</span>);    <span class="cmt">// → false</span>
+
+<span class="kw">const</span> esAdmin = <span class="kw">false</span>, esDocente = <span class="kw">true</span>;
+<span class="pp">console</span>.<span class="fn">log</span>(esAdmin || esDocente);     <span class="cmt">// → true  (tiene acceso)</span>
+
+<span class="cmt">// !  (NOT) — invierte el valor booleano</span>
+<span class="pp">console</span>.<span class="fn">log</span>(!<span class="kw">true</span>);              <span class="cmt">// → false</span>
+<span class="pp">console</span>.<span class="fn">log</span>(!<span class="kw">false</span>);             <span class="cmt">// → true</span>
+<span class="pp">console</span>.<span class="fn">log</span>(!(edad &gt;= <span class="num">18</span>));      <span class="cmt">// → false (NO es mayor de edad)</span>
+
+<span class="cmt">// Short-circuit — valor por defecto con ||</span>
+<span class="kw">const</span> nombre = <span class="kw">undefined</span>;
+<span class="pp">console</span>.<span class="fn">log</span>(nombre || <span class="str">"Anónimo"</span>); <span class="cmt">// → "Anónimo"  (nombre es falsy)</span>
+
+<span class="cmt">// ?? (Nullish coalescing, ES2020) — solo activa si null/undefined</span>
+<span class="kw">const</span> puntaje = <span class="num">0</span>;
+<span class="pp">console</span>.<span class="fn">log</span>(puntaje || <span class="num">100</span>);     <span class="cmt">// → 100  ⚠ 0 es falsy</span>
+<span class="pp">console</span>.<span class="fn">log</span>(puntaje ?? <span class="num">100</span>);     <span class="cmt">// → 0   ✓ 0 no es null/undefined</span></pre>
+    </div>
+
+    <!-- TERNARIO -->
+    <div class="section-title">Operador Ternario</div>
+    <div class="prose">
+      <p>El operador ternario es una forma compacta de escribir un <code>if/else</code> simple en una sola línea. Su sintaxis es: <code>condición ? valorSiTrue : valorSiFalse</code>.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Operador ternario</span>
+      </div>
+      <pre><span class="kw">const</span> edad = <span class="num">17</span>;
+
+<span class="cmt">// Con if/else clásico</span>
+<span class="kw">let</span> acceso;
+<span class="kw">if</span> (edad &gt;= <span class="num">18</span>) {
+  acceso = <span class="str">"Permitido"</span>;
+} <span class="kw">else</span> {
+  acceso = <span class="str">"Denegado"</span>;
+}
+
+<span class="cmt">// Con operador ternario — equivalente, más compacto</span>
+<span class="kw">const</span> acceso2 = edad &gt;= <span class="num">18</span> ? <span class="str">"Permitido"</span> : <span class="str">"Denegado"</span>;
+<span class="pp">console</span>.<span class="fn">log</span>(acceso2);  <span class="cmt">// → "Denegado"</span>
+
+<span class="cmt">// Otros usos comunes</span>
+<span class="kw">const</span> nota = <span class="num">72</span>;
+<span class="kw">const</span> resultado = nota &gt;= <span class="num">60</span> ? <span class="str">"Aprobado"</span> : <span class="str">"Reprobado"</span>;
+<span class="kw">const</span> tipo      = nota % <span class="num">2</span> === <span class="num">0</span> ? <span class="str">"par"</span> : <span class="str">"impar"</span>;
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="str">`Nota ${nota}: ${resultado} (${tipo})`</span>);
+<span class="cmt">// → "Nota 72: Aprobado (par)"</span>
+
+<span class="cmt">// Ternario en template literal</span>
+<span class="kw">const</span> stock = <span class="num">0</span>;
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="str">`Producto: ${stock &gt; <span class="num">0</span> ? <span class="str">"En stock"</span> : <span class="str">"Agotado"</span>}`</span>);
+<span class="cmt">// → "Producto: Agotado"</span></pre>
+    </div>
+
+    <div class="section-title">Resumen de Operadores</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Categoría</th><th>Operadores</th><th>Devuelve</th></tr></thead>
+        <tbody>
+          <tr><td>Aritméticos</td><td><code>+ - * / % **</code></td><td>Number (o string si hay concatenación)</td></tr>
+          <tr><td>Asignación</td><td><code>= += -= *= /= %= **=</code></td><td>El valor asignado</td></tr>
+          <tr><td>Comparación</td><td><code>=== !== > >= &lt; &lt;=</code></td><td>Boolean</td></tr>
+          <tr><td>Lógicos</td><td><code>&amp;&amp; || ! ??</code></td><td>Boolean o el valor evaluado</td></tr>
+          <tr><td>Ternario</td><td><code>condición ? a : b</code></td><td>El valor de la rama elegida</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="activity">
+      <div class="activity-label">Ejercicio</div>
+      <h4>Escribe la expresión que resuelve cada caso:</h4>
+      <ol style="padding-left:20px; color:var(--text); font-size:14px; line-height:2.5;">
+        <li>Calcular el área de un círculo de radio 7 usando <code>Math.PI</code> y <code>**</code>.</li>
+        <li>Verificar si un número <code>n</code> es divisible entre 3 Y entre 5 al mismo tiempo.</li>
+        <li>Asignar <code>"Mayor"</code> o <code>"Menor"</code> según si <code>x &gt; y</code> usando el ternario.</li>
+        <li>Obtener el valor de una variable <code>descuento</code> que puede ser <code>null</code>, usando <code>??</code> para que el default sea <code>0</code>.</li>
+        <li>Incrementar un contador <code>intentos</code> y verificar si ya superó <code>MAX = 3</code>.</li>
+      </ol>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════
+       CLASE 5 — Condicionales
+  ══════════════════════════════════════ -->
+  <section class="class-section" id="clase5">
+    <div class="class-header">
+      <div class="class-badge">
+        <span class="class-badge-label">Clase</span>
+        <span class="class-badge-num">5</span>
+      </div>
+      <div>
+        <div class="class-title">Condicionales</div>
+        <div class="class-title-sub">if · else if · else · switch · Anidamiento · Buenas prácticas</div>
+      </div>
+    </div>
+
+    <div class="objectives">
+      <div class="objectives-label">Objetivos</div>
+      <ul>
+        <li>Controlar el flujo del programa con sentencias <code>if / else if / else</code>.</li>
+        <li>Usar <code>switch</code> para múltiples casos de un mismo valor.</li>
+        <li>Evitar anidamientos excesivos con <em>early returns</em> y guardias.</li>
+      </ul>
+    </div>
+
+    <div class="section-title">if — La Decisión Básica</div>
+    <div class="prose">
+      <p>La sentencia <code>if</code> ejecuta un bloque de código <strong>solo si su condición es verdadera</strong> (truthy). Si la condición es falsa, el bloque se omite completamente.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — if</span>
+      </div>
+      <pre><span class="kw">const</span> temperatura = <span class="num">35</span>;
+
+<span class="kw">if</span> (temperatura &gt; <span class="num">30</span>) {
+  <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Hace calor."</span>);
+}
+<span class="cmt">// → "Hace calor."  (la condición es true)</span>
+
+<span class="kw">if</span> (temperatura &lt; <span class="num">0</span>) {
+  <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Hace frío extremo."</span>);
+}
+<span class="cmt">// (no imprime nada — la condición es false)</span></pre>
+    </div>
+
+    <div class="section-title">if / else — Dos Caminos</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — if / else</span>
+      </div>
+      <pre><span class="kw">const</span> nota = <span class="num">55</span>;
+
+<span class="kw">if</span> (nota &gt;= <span class="num">60</span>) {
+  <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Aprobado"</span>);
+} <span class="kw">else</span> {
+  <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Reprobado"</span>);
+}
+<span class="cmt">// → "Reprobado"</span>
+
+<span class="cmt">// Verificar si un número es par o impar</span>
+<span class="kw">const</span> numero = <span class="num">7</span>;
+<span class="kw">if</span> (numero % <span class="num">2</span> === <span class="num">0</span>) {
+  <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">`${numero} es par`</span>);
+} <span class="kw">else</span> {
+  <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">`${numero} es impar`</span>);
+}
+<span class="cmt">// → "7 es impar"</span></pre>
+    </div>
+
+    <div class="section-title">if / else if / else — Múltiples Condiciones</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Calificación por rango</span>
+      </div>
+      <pre><span class="kw">const</span> nota = <span class="num">78</span>;
+<span class="kw">let</span> calificacion;
+
+<span class="kw">if</span> (nota &gt;= <span class="num">90</span>) {
+  calificacion = <span class="str">"Excelente"</span>;
+} <span class="kw">else if</span> (nota &gt;= <span class="num">80</span>) {
+  calificacion = <span class="str">"Muy Bueno"</span>;
+} <span class="kw">else if</span> (nota &gt;= <span class="num">70</span>) {
+  calificacion = <span class="str">"Bueno"</span>;
+} <span class="kw">else if</span> (nota &gt;= <span class="num">60</span>) {
+  calificacion = <span class="str">"Suficiente"</span>;
+} <span class="kw">else</span> {
+  calificacion = <span class="str">"Reprobado"</span>;
+}
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="str">`Nota ${nota}: ${calificacion}`</span>);
+<span class="cmt">// → "Nota 78: Bueno"</span></pre>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-label">Cómo funciona else if</div>
+      JavaScript evalúa las condiciones <strong>de arriba hacia abajo</strong>. En cuanto encuentra una verdadera, ejecuta ese bloque y <strong>omite el resto</strong>. El <code>else</code> final actúa como red de seguridad si ninguna condición anterior fue verdadera.
+    </div>
+
+    <div class="section-title">switch — Muchos Casos, un Solo Valor</div>
+    <div class="prose">
+      <p><code>switch</code> compara una expresión con múltiples valores posibles usando <strong>igualdad estricta</strong>. Es más legible que muchos <code>else if</code> cuando se compara el mismo valor contra constantes. El <code>break</code> es obligatorio para evitar <em>fall-through</em> (ejecutar los casos siguientes).</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — switch</span>
+      </div>
+      <pre><span class="kw">const</span> dia = <span class="str">"lunes"</span>;
+
+<span class="kw">switch</span> (dia) {
+  <span class="kw">case</span> <span class="str">"lunes"</span>:
+    <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Inicio de semana"</span>);
+    <span class="kw">break</span>;
+  <span class="kw">case</span> <span class="str">"viernes"</span>:
+    <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Casi fin de semana"</span>);
+    <span class="kw">break</span>;
+  <span class="kw">case</span> <span class="str">"sábado"</span>:
+  <span class="kw">case</span> <span class="str">"domingo"</span>:                   <span class="cmt">// dos casos → mismo bloque</span>
+    <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Fin de semana"</span>);
+    <span class="kw">break</span>;
+  <span class="kw">default</span>:
+    <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Día entre semana"</span>);
+}
+<span class="cmt">// → "Inicio de semana"</span>
+
+<span class="cmt">// Ejemplo: nombre del mes</span>
+<span class="kw">const</span> mes = <span class="num">6</span>;
+<span class="kw">switch</span> (mes) {
+  <span class="kw">case</span>  <span class="num">1</span>: <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Enero"</span>);      <span class="kw">break</span>;
+  <span class="kw">case</span>  <span class="num">2</span>: <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Febrero"</span>);    <span class="kw">break</span>;
+  <span class="kw">case</span>  <span class="num">3</span>: <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Marzo"</span>);      <span class="kw">break</span>;
+  <span class="kw">case</span>  <span class="num">4</span>: <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Abril"</span>);      <span class="kw">break</span>;
+  <span class="kw">case</span>  <span class="num">5</span>: <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Mayo"</span>);       <span class="kw">break</span>;
+  <span class="kw">case</span>  <span class="num">6</span>: <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Junio"</span>);      <span class="kw">break</span>;
+  <span class="kw">default</span>: <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Mes inválido"</span>);
+}
+<span class="cmt">// → "Junio"</span></pre>
+    </div>
+
+    <div class="section-title">Anidamiento y Early Return</div>
+    <div class="prose">
+      <p>Anidar demasiados <code>if</code> produce código difícil de leer ("pirámide de la muerte"). La técnica <strong>early return</strong> (o guardia) invierte la condición y retorna/sale temprano de la función, aplanando el código.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Early return</span>
+      </div>
+      <pre><span class="cmt">// ✗ Versión con anidamiento profundo (difícil de leer)</span>
+<span class="kw">function</span> <span class="fn">registrarUsuarioMal</span>(nombre, edad, email) {
+  <span class="kw">if</span> (nombre) {
+    <span class="kw">if</span> (edad &gt;= <span class="num">18</span>) {
+      <span class="kw">if</span> (email.<span class="fn">includes</span>(<span class="str">"@"</span>)) {
+        <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Usuario registrado"</span>);
+      }
+    }
+  }
+}
+
+<span class="cmt">// ✓ Versión con early return (clara y plana)</span>
+<span class="kw">function</span> <span class="fn">registrarUsuario</span>(nombre, edad, email) {
+  <span class="kw">if</span> (!nombre)              <span class="kw">return</span> <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Nombre requerido"</span>);
+  <span class="kw">if</span> (edad &lt; <span class="num">18</span>)            <span class="kw">return</span> <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Debe ser mayor de edad"</span>);
+  <span class="kw">if</span> (!email.<span class="fn">includes</span>(<span class="str">"@"</span>)) <span class="kw">return</span> <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Email inválido"</span>);
+
+  <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Usuario registrado"</span>); <span class="cmt">// solo llega aquí si todo pasó</span>
+}
+
+<span class="fn">registrarUsuario</span>(<span class="str">"Ana"</span>, <span class="num">17</span>, <span class="str">"ana@mail.com"</span>);  <span class="cmt">// → "Debe ser mayor de edad"</span>
+<span class="fn">registrarUsuario</span>(<span class="str">"Ana"</span>, <span class="num">20</span>, <span class="str">"ana@mail.com"</span>);  <span class="cmt">// → "Usuario registrado"</span></pre>
+    </div>
+
+    <div class="section-title">Comparativa: if vs switch vs ternario</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Estructura</th><th>Usar cuando…</th><th>Devuelve valor</th></tr></thead>
+        <tbody>
+          <tr><td><code>if / else</code></td><td>Condiciones de rangos o expresiones complejas</td><td>No directamente</td></tr>
+          <tr><td><code>else if</code></td><td>Varios rangos del mismo valor</td><td>No directamente</td></tr>
+          <tr><td><code>switch</code></td><td>Un valor fijo vs. muchos casos exactos</td><td>No directamente</td></tr>
+          <tr><td>Ternario</td><td>Asignación simple de uno u otro valor</td><td>Sí</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="activity">
+      <div class="activity-label">Ejercicio práctico</div>
+      <h4>Implementa las siguientes funciones:</h4>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+          <span class="code-block-lang">JavaScript — Ejercicios</span>
+        </div>
+        <pre><span class="cmt">// 1. Función que devuelve la categoría de un estudiante según su nota:
+//    90-100 → "Excelente" | 75-89 → "Muy Bueno" | 60-74 → "Aprobado" | &lt;60 → "Reprobado"</span>
+<span class="kw">function</span> <span class="fn">categoria</span>(nota) {
+  <span class="cmt">// tu código aquí</span>
+}
+
+<span class="cmt">// 2. Función que recibe el número de un mes (1-12)
+//    y devuelve si es "Primer trimestre", "Segundo trimestre",
+//    "Tercer trimestre" o "Cuarto trimestre" usando switch.</span>
+<span class="kw">function</span> <span class="fn">trimestre</span>(mes) {
+  <span class="cmt">// tu código aquí</span>
+}
+
+<span class="cmt">// 3. Función con early return que valida una contraseña:
+//    - No puede estar vacía
+//    - Debe tener al menos 8 caracteres
+//    - Debe incluir al menos un número (pista: usa /[0-9]/.test(pass))
+//    Si pasa todas las validaciones, devuelve "Contraseña válida"</span>
+<span class="kw">function</span> <span class="fn">validarPassword</span>(pass) {
+  <span class="cmt">// tu código aquí</span>
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════
+       CLASE 6 — Bucles
+  ══════════════════════════════════════ -->
+  <section class="class-section" id="clase6">
+    <div class="class-header">
+      <div class="class-badge">
+        <span class="class-badge-label">Clase</span>
+        <span class="class-badge-num">6</span>
+      </div>
+      <div>
+        <div class="class-title">Bucles</div>
+        <div class="class-title-sub">for · while · do-while · for…of · for…in · break · continue</div>
+      </div>
+    </div>
+
+    <div class="objectives">
+      <div class="objectives-label">Objetivos</div>
+      <ul>
+        <li>Iterar colecciones y repetir lógica con los distintos tipos de bucle.</li>
+        <li>Elegir el bucle correcto según el contexto (arrays, objetos, conteo, condición).</li>
+        <li>Usar <code>break</code> y <code>continue</code> para controlar el flujo dentro de bucles.</li>
+      </ul>
+    </div>
+
+    <!-- FOR -->
+    <div class="section-title">for — Bucle con Contador Controlado</div>
+    <div class="prose">
+      <p>El <code>for</code> clásico es ideal cuando <strong>conoces de antemano</strong> cuántas veces deseas repetir algo. Tiene tres partes: inicialización, condición y actualización.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — for</span>
+      </div>
+      <pre><span class="cmt">//      inicio   condición  actualización</span>
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i &lt; <span class="num">5</span>; i++) {
+  <span class="pp">console</span>.<span class="fn">log</span>(i);        <span class="cmt">// → 0, 1, 2, 3, 4</span>
+}
+
+<span class="cmt">// Recorrer un array con for clásico</span>
+<span class="kw">const</span> frutas = [<span class="str">"manzana"</span>, <span class="str">"pera"</span>, <span class="str">"naranja"</span>];
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i &lt; frutas.length; i++) {
+  <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">`[${i}] ${frutas[i]}`</span>);
+}
+<span class="cmt">// → [0] manzana  [1] pera  [2] naranja</span>
+
+<span class="cmt">// Bucle hacia atrás</span>
+<span class="kw">for</span> (<span class="kw">let</span> i = frutas.length - <span class="num">1</span>; i &gt;= <span class="num">0</span>; i--) {
+  <span class="pp">console</span>.<span class="fn">log</span>(frutas[i]);
+}
+<span class="cmt">// → naranja  pera  manzana</span>
+
+<span class="cmt">// Calcular la suma de un array</span>
+<span class="kw">const</span> notas = [<span class="num">75</span>, <span class="num">88</span>, <span class="num">92</span>, <span class="num">60</span>];
+<span class="kw">let</span> suma = <span class="num">0</span>;
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i &lt; notas.length; i++) {
+  suma += notas[i];
+}
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="str">`Promedio: ${suma / notas.length}`</span>);  <span class="cmt">// → 78.75</span></pre>
+    </div>
+
+    <!-- FOR...OF -->
+    <div class="section-title">for…of — Iterar Valores de un Iterable (ES6)</div>
+    <div class="prose">
+      <p><code>for...of</code> es la forma moderna de recorrer arrays, strings, o cualquier iterable cuando <strong>no necesitas el índice</strong>. El código es más limpio y menos propenso a errores de índice.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — for…of</span>
+      </div>
+      <pre><span class="kw">const</span> frutas = [<span class="str">"manzana"</span>, <span class="str">"pera"</span>, <span class="str">"naranja"</span>];
+
+<span class="kw">for</span> (<span class="kw">const</span> fruta <span class="kw">of</span> frutas) {
+  <span class="pp">console</span>.<span class="fn">log</span>(fruta);
+}
+<span class="cmt">// → manzana  pera  naranja</span>
+
+<span class="cmt">// Sumar notas con for...of</span>
+<span class="kw">const</span> notas = [<span class="num">75</span>, <span class="num">88</span>, <span class="num">92</span>, <span class="num">60</span>];
+<span class="kw">let</span> total = <span class="num">0</span>;
+<span class="kw">for</span> (<span class="kw">const</span> nota <span class="kw">of</span> notas) {
+  total += nota;
+}
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="str">`Total: ${total}`</span>);            <span class="cmt">// → 315</span>
+
+<span class="cmt">// Iterar caracteres de un string</span>
+<span class="kw">const</span> palabra = <span class="str">"UNAH"</span>;
+<span class="kw">for</span> (<span class="kw">const</span> letra <span class="kw">of</span> palabra) {
+  <span class="pp">console</span>.<span class="fn">log</span>(letra);                       <span class="cmt">// → U N A H</span>
+}
+
+<span class="cmt">// Con entries() si necesitas el índice también</span>
+<span class="kw">for</span> (<span class="kw">const</span> [i, fruta] <span class="kw">of</span> frutas.<span class="fn">entries</span>()) {
+  <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">`${i}: ${fruta}`</span>);
+}
+<span class="cmt">// → 0: manzana   1: pera   2: naranja</span></pre>
+    </div>
+
+    <!-- FOR...IN -->
+    <div class="section-title">for…in — Iterar Propiedades de un Objeto</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — for…in</span>
+      </div>
+      <pre><span class="kw">const</span> estudiante = {
+  nombre: <span class="str">"Carlos"</span>,
+  carrera: <span class="str">"Ingeniería en Sistemas"</span>,
+  promedio: <span class="num">85</span>,
+  activo: <span class="kw">true</span>
+};
+
+<span class="kw">for</span> (<span class="kw">const</span> propiedad <span class="kw">in</span> estudiante) {
+  <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">`${propiedad}: ${estudiante[propiedad]}`</span>);
+}
+<span class="cmt">// → nombre: Carlos</span>
+<span class="cmt">// → carrera: Ingeniería en Sistemas</span>
+<span class="cmt">// → promedio: 85</span>
+<span class="cmt">// → activo: true</span>
+
+<span class="cmt">// Contar propiedades de un objeto</span>
+<span class="kw">let</span> conteo = <span class="num">0</span>;
+<span class="kw">for</span> (<span class="kw">const</span> _ <span class="kw">in</span> estudiante) conteo++;
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="str">`El objeto tiene ${conteo} propiedades`</span>);  <span class="cmt">// → 4</span></pre>
+    </div>
+
+    <!-- WHILE -->
+    <div class="section-title">while — Repetir Mientras se Cumpla una Condición</div>
+    <div class="prose">
+      <p><code>while</code> se usa cuando <strong>no sabes cuántas iteraciones</strong> serán necesarias. Evalúa la condición <strong>antes</strong> de cada iteración. Si la condición empieza siendo falsa, el cuerpo no se ejecuta ni una vez.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — while</span>
+      </div>
+      <pre><span class="kw">let</span> intentos = <span class="num">0</span>;
+<span class="kw">const</span> MAX = <span class="num">3</span>;
+
+<span class="kw">while</span> (intentos &lt; MAX) {
+  intentos++;
+  <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">`Intento ${intentos}`</span>);
+}
+<span class="cmt">// → Intento 1  Intento 2  Intento 3</span>
+
+<span class="cmt">// Doblar un número hasta superar 1000</span>
+<span class="kw">let</span> valor = <span class="num">1</span>;
+<span class="kw">let</span> pasos = <span class="num">0</span>;
+<span class="kw">while</span> (valor &lt;= <span class="num">1000</span>) {
+  valor *= <span class="num">2</span>;
+  pasos++;
+}
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="str">`Valor: ${valor}, pasos: ${pasos}`</span>);
+<span class="cmt">// → Valor: 1024, pasos: 10</span>
+
+<span class="cmt">// Procesar elementos de un array sacándolos uno a uno</span>
+<span class="kw">const</span> cola = [<span class="str">"tarea1"</span>, <span class="str">"tarea2"</span>, <span class="str">"tarea3"</span>];
+<span class="kw">while</span> (cola.length &gt; <span class="num">0</span>) {
+  <span class="kw">const</span> tarea = cola.<span class="fn">shift</span>();  <span class="cmt">// saca el primero</span>
+  <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">`Procesando: ${tarea}`</span>);
+}</pre>
+    </div>
+
+    <!-- DO...WHILE -->
+    <div class="section-title">do…while — Ejecutar al Menos una Vez</div>
+    <div class="prose">
+      <p><code>do...while</code> evalúa la condición <strong>después</strong> de ejecutar el bloque. Garantiza que el cuerpo se ejecute <strong>al menos una vez</strong>, sin importar la condición.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — do…while</span>
+      </div>
+      <pre><span class="kw">let</span> numero;
+<span class="kw">let</span> intentosSim = <span class="num">0</span>;
+
+<span class="cmt">// Simula pedir un número hasta que sea positivo</span>
+<span class="kw">const</span> entradas = [<span class="num">-5</span>, <span class="num">-2</span>, <span class="num">8</span>]; <span class="cmt">// simulación de entradas del usuario</span>
+<span class="kw">let</span> idx = <span class="num">0</span>;
+
+<span class="kw">do</span> {
+  numero = entradas[idx++];
+  <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">`Entrada: ${numero}`</span>);
+} <span class="kw">while</span> (numero &lt; <span class="num">0</span>);
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="str">`Número válido: ${numero}`</span>);
+<span class="cmt">// → Entrada: -5</span>
+<span class="cmt">// → Entrada: -2</span>
+<span class="cmt">// → Entrada: 8</span>
+<span class="cmt">// → Número válido: 8</span></pre>
+    </div>
+
+    <!-- BREAK / CONTINUE -->
+    <div class="section-title">break y continue — Control de Flujo en Bucles</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — break y continue</span>
+      </div>
+      <pre><span class="cmt">// break — detiene el bucle completamente</span>
+<span class="kw">const</span> notas = [<span class="num">80</span>, <span class="num">75</span>, <span class="num">45</span>, <span class="num">90</span>, <span class="num">88</span>];
+<span class="kw">let</span> primerReprobado = -<span class="num">1</span>;
+
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i &lt; notas.length; i++) {
+  <span class="kw">if</span> (notas[i] &lt; <span class="num">60</span>) {
+    primerReprobado = i;
+    <span class="kw">break</span>;             <span class="cmt">// sale del bucle en cuanto encuentra uno</span>
+  }
+}
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="str">`Primer reprobado en índice: ${primerReprobado}`</span>);
+<span class="cmt">// → "Primer reprobado en índice: 2"</span>
+
+<span class="cmt">// continue — salta a la siguiente iteración</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Notas aprobadas:"</span>);
+<span class="kw">for</span> (<span class="kw">const</span> nota <span class="kw">of</span> notas) {
+  <span class="kw">if</span> (nota &lt; <span class="num">60</span>) <span class="kw">continue</span>;   <span class="cmt">// ignora las reprobadas</span>
+  <span class="pp">console</span>.<span class="fn">log</span>(nota);
+}
+<span class="cmt">// → 80   75   90   88</span>
+
+<span class="cmt">// Imprimir solo múltiplos de 3 entre 1 y 20</span>
+<span class="kw">const</span> multiplos = [];
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">1</span>; i &lt;= <span class="num">20</span>; i++) {
+  <span class="kw">if</span> (i % <span class="num">3</span> !== <span class="num">0</span>) <span class="kw">continue</span>;
+  multiplos.<span class="fn">push</span>(i);
+}
+<span class="pp">console</span>.<span class="fn">log</span>(multiplos);
+<span class="cmt">// → [3, 6, 9, 12, 15, 18]</span></pre>
+    </div>
+
+    <div class="section-title">¿Qué Bucle Usar?</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Bucle</th><th>Úsalo cuando…</th><th>Accede a índice</th></tr></thead>
+        <tbody>
+          <tr><td><code>for</code></td><td>Sabes cuántas iteraciones, necesitas el índice, o vas hacia atrás</td><td>Sí</td></tr>
+          <tr><td><code>for...of</code></td><td>Recorres un array/string y solo necesitas el valor</td><td>Con <code>.entries()</code></td></tr>
+          <tr><td><code>for...in</code></td><td>Iteras las propiedades de un objeto</td><td>La clave es el índice</td></tr>
+          <tr><td><code>while</code></td><td>No sabes cuántas iteraciones — condición variable</td><td>Manual</td></tr>
+          <tr><td><code>do...while</code></td><td>El cuerpo debe ejecutarse al menos una vez</td><td>Manual</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="activity">
+      <div class="activity-label">Ejercicios de bucles</div>
+      <h4>Implementa las siguientes funciones usando el bucle más apropiado:</h4>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+          <span class="code-block-lang">JavaScript — Ejercicios</span>
+        </div>
+        <pre><span class="cmt">// 1. Calcular el factorial de n (n!)
+//    factorial(5) → 120  (5*4*3*2*1)</span>
+<span class="kw">function</span> <span class="fn">factorial</span>(n) { <span class="cmt">/* tu código */</span> }
+
+<span class="cmt">// 2. Contar cuántos números pares hay en un array
+//    contarPares([1,2,3,4,5,6]) → 3</span>
+<span class="kw">function</span> <span class="fn">contarPares</span>(arr) { <span class="cmt">/* tu código */</span> }
+
+<span class="cmt">// 3. Buscar el número más grande de un array SIN usar Math.max
+//    maximo([3, 17, 5, 42, 9]) → 42</span>
+<span class="kw">function</span> <span class="fn">maximo</span>(arr) { <span class="cmt">/* tu código */</span> }
+
+<span class="cmt">// 4. Invertir una cadena de texto usando for...of
+//    invertir("Hola") → "aloH"</span>
+<span class="kw">function</span> <span class="fn">invertir</span>(texto) { <span class="cmt">/* tu código */</span> }
+
+<span class="cmt">// 5. Imprimir la tabla de multiplicar de un número n
+//    tablaMult(7) → "7 x 1 = 7", "7 x 2 = 14", …, "7 x 10 = 70"</span>
+<span class="kw">function</span> <span class="fn">tablaMult</span>(n) { <span class="cmt">/* tu código */</span> }
+
+<span class="cmt">// 6. Sumar solo los números positivos de un array (usar continue)
+//    sumarPositivos([-3, 5, -1, 8, -2, 4]) → 17</span>
+<span class="kw">function</span> <span class="fn">sumarPositivos</span>(arr) { <span class="cmt">/* tu código */</span> }</pre>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════
+       CLASE 7 — Funciones declaradas
+  ══════════════════════════════════════ -->
+  <section class="class-section" id="clase7">
+    <div class="class-header">
+      <div class="class-badge">
+        <span class="class-badge-label">Clase</span>
+        <span class="class-badge-num">7</span>
+      </div>
+      <div>
+        <div class="class-title">Funciones Declaradas</div>
+        <div class="class-title-sub">Declaración · Invocación · Parámetros · Retorno · Hoisting</div>
+      </div>
+    </div>
+
+    <div class="objectives">
+      <div class="objectives-label">Objetivos</div>
+      <ul>
+        <li>Entender qué es una función y para qué sirve en programación.</li>
+        <li>Declarar e invocar funciones con parámetros y valor de retorno.</li>
+        <li>Comprender el hoisting de funciones y sus implicaciones.</li>
+        <li>Distinguir entre parámetros y argumentos.</li>
+      </ul>
+    </div>
+
+    <div class="section-title">¿Qué es una Función?</div>
+    <div class="prose">
+      <p>Una <strong>función</strong> es un bloque de código con nombre, reutilizable, que realiza una tarea específica. En el paradigma funcional, las funciones son el elemento central del programa: en lugar de dar instrucciones paso a paso, se <em>describen transformaciones</em> a través de funciones que reciben datos y producen resultados sin modificar el estado externo.</p>
+      <p>Una buena función debe hacer <strong>una sola cosa</strong> y hacerla bien — es el principio de responsabilidad única aplicado a funciones.</p>
+    </div>
+
+    <div class="section-title">Anatomía de una Función</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Declaración de función</span>
+      </div>
+      <pre><span class="cmt">//  palabra clave  nombre     parámetros
+//       ↓           ↓            ↓        </span>
+<span class="kw">function</span> <span class="fn">saludar</span>(nombre) {
+  <span class="kw">return</span> <span class="str">`Hola, ${nombre}!`</span>;   <span class="cmt">// ← valor de retorno</span>
+}
+
+<span class="cmt">// Invocar (llamar) la función</span>
+<span class="kw">const</span> mensaje = <span class="fn">saludar</span>(<span class="str">"Ana"</span>);  <span class="cmt">// "Ana" es el argumento</span>
+<span class="pp">console</span>.<span class="fn">log</span>(mensaje);            <span class="cmt">// → "Hola, Ana!"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">saludar</span>(<span class="str">"UNAH"</span>));   <span class="cmt">// → "Hola, UNAH!"</span></pre>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-label">Parámetro vs Argumento</div>
+      El <strong>parámetro</strong> es la variable definida en la declaración (<code>nombre</code>). El <strong>argumento</strong> es el valor concreto que se pasa al invocar (<code>"Ana"</code>). Son la misma ranura, con dos nombres distintos según el momento.
+    </div>
+
+    <div class="section-title">Funciones sin Retorno</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript</span>
+      </div>
+      <pre><span class="cmt">// Sin return → la función devuelve undefined</span>
+<span class="kw">function</span> <span class="fn">mostrarBienvenida</span>(nombre) {
+  <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">`Bienvenido, ${nombre}`</span>);
+  <span class="cmt">// no hay return → efecto lateral (I/O)</span>
+}
+
+<span class="fn">mostrarBienvenida</span>(<span class="str">"Carlos"</span>);           <span class="cmt">// → "Bienvenido, Carlos"</span>
+<span class="kw">const</span> r = <span class="fn">mostrarBienvenida</span>(<span class="str">"Ana"</span>);
+<span class="pp">console</span>.<span class="fn">log</span>(r);                         <span class="cmt">// → undefined</span></pre>
+    </div>
+
+    <div class="section-title">Múltiples Parámetros y Retorno</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Múltiples parámetros</span>
+      </div>
+      <pre><span class="kw">function</span> <span class="fn">sumar</span>(a, b) {
+  <span class="kw">return</span> a + b;
+}
+
+<span class="kw">function</span> <span class="fn">areaRectangulo</span>(base, altura) {
+  <span class="kw">return</span> base * altura;
+}
+
+<span class="kw">function</span> <span class="fn">promedioTres</span>(n1, n2, n3) {
+  <span class="kw">return</span> (n1 + n2 + n3) / <span class="num">3</span>;
+}
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">sumar</span>(<span class="num">5</span>, <span class="num">8</span>));                     <span class="cmt">// → 13</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">areaRectangulo</span>(<span class="num">4</span>, <span class="num">6</span>));            <span class="cmt">// → 24</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">promedioTres</span>(<span class="num">80</span>, <span class="num">90</span>, <span class="num">70</span>));        <span class="cmt">// → 80</span>
+
+<span class="cmt">// return detiene la ejecución — el código después es inalcanzable</span>
+<span class="kw">function</span> <span class="fn">esMayorDeEdad</span>(edad) {
+  <span class="kw">if</span> (edad &lt; <span class="num">0</span>) <span class="kw">return</span> <span class="kw">null</span>;      <span class="cmt">// guardia temprana</span>
+  <span class="kw">return</span> edad &gt;= <span class="num">18</span>;               <span class="cmt">// boolean</span>
+}
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">esMayorDeEdad</span>(<span class="num">20</span>));               <span class="cmt">// → true</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">esMayorDeEdad</span>(<span class="num">15</span>));               <span class="cmt">// → false</span></pre>
+    </div>
+
+    <div class="section-title">Hoisting de Funciones</div>
+    <div class="prose">
+      <p>Las funciones declaradas con <code>function</code> son <strong>elevadas completamente</strong> al inicio de su scope: puedes invocarlas <em>antes</em> de donde las declaras en el código fuente. Esto no ocurre con funciones expresadas o arrow functions.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Hoisting de funciones</span>
+      </div>
+      <pre><span class="cmt">// ✓ funciona aunque la invocación está ANTES de la declaración</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">doblar</span>(<span class="num">5</span>));          <span class="cmt">// → 10</span>
+
+<span class="kw">function</span> <span class="fn">doblar</span>(n) {
+  <span class="kw">return</span> n * <span class="num">2</span>;
+}
+
+<span class="cmt">// ✗ función expresada — NO se eleva</span>
+<span class="cmt">// console.log(triplicar(5));   // ReferenceError</span>
+<span class="kw">const</span> <span class="fn">triplicar</span> = <span class="kw">function</span>(n) {
+  <span class="kw">return</span> n * <span class="num">3</span>;
+};</pre>
+    </div>
+
+    <div class="section-title">Funciones que Llaman a Otras Funciones</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Composición básica</span>
+      </div>
+      <pre><span class="kw">function</span> <span class="fn">cuadrado</span>(n) {
+  <span class="kw">return</span> n * n;
+}
+
+<span class="kw">function</span> <span class="fn">sumaDeCuadrados</span>(a, b) {
+  <span class="kw">return</span> <span class="fn">cuadrado</span>(a) + <span class="fn">cuadrado</span>(b);  <span class="cmt">// usa otra función</span>
+}
+
+<span class="kw">function</span> <span class="fn">hipotenusa</span>(cateto1, cateto2) {
+  <span class="kw">return</span> <span class="pp">Math</span>.<span class="fn">sqrt</span>(<span class="fn">sumaDeCuadrados</span>(cateto1, cateto2));
+}
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">hipotenusa</span>(<span class="num">3</span>, <span class="num">4</span>));      <span class="cmt">// → 5  (triángulo 3-4-5)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">hipotenusa</span>(<span class="num">5</span>, <span class="num">12</span>));     <span class="cmt">// → 13</span></pre>
+    </div>
+
+    <div class="activity">
+      <div class="activity-label">Ejercicio</div>
+      <h4>Declara las siguientes funciones:</h4>
+      <ol style="padding-left:20px; color:var(--text); font-size:14px; line-height:2.5;">
+        <li><code>celsiusAFahrenheit(c)</code> → devuelve <code>c * 9/5 + 32</code></li>
+        <li><code>esBisiesto(año)</code> → devuelve <code>true</code> si el año es bisiesto (divisible entre 4 pero no entre 100, o divisible entre 400)</li>
+        <li><code>calcularIVA(precio, tasa)</code> → devuelve el precio con IVA incluido</li>
+        <li><code>maxDeTres(a, b, c)</code> → devuelve el mayor de los tres sin usar <code>Math.max</code></li>
+      </ol>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════
+       CLASE 8 — Parámetros avanzados
+  ══════════════════════════════════════ -->
+  <section class="class-section" id="clase8">
+    <div class="class-header">
+      <div class="class-badge">
+        <span class="class-badge-label">Clase</span>
+        <span class="class-badge-num">8</span>
+      </div>
+      <div>
+        <div class="class-title">Parámetros Avanzados</div>
+        <div class="class-title-sub">Default params · Rest params · Spread · Destructuring en parámetros</div>
+      </div>
+    </div>
+
+    <div class="objectives">
+      <div class="objectives-label">Objetivos</div>
+      <ul>
+        <li>Definir valores por defecto para parámetros opcionales.</li>
+        <li>Agrupar argumentos variables con el operador rest (<code>...args</code>).</li>
+        <li>Expandir arrays como argumentos con el operador spread (<code>...</code>).</li>
+        <li>Desestructurar objetos y arrays directamente en la firma de una función.</li>
+      </ul>
+    </div>
+
+    <div class="section-title">Parámetros por Defecto (Default Parameters — ES6)</div>
+    <div class="prose">
+      <p>Cuando un argumento no se pasa (o se pasa <code>undefined</code>), el parámetro toma su valor por defecto. Esto elimina la necesidad de validar manualmente con <code>if</code> o <code>||</code>.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Default parameters</span>
+      </div>
+      <pre><span class="cmt">// Antes de ES6 — patrón manual</span>
+<span class="kw">function</span> <span class="fn">saludarViejo</span>(nombre) {
+  nombre = nombre || <span class="str">"Estudiante"</span>;  <span class="cmt">// ⚠ falla si nombre es 0 o ""</span>
+  <span class="kw">return</span> <span class="str">`Hola, ${nombre}`</span>;
+}
+
+<span class="cmt">// Con parámetros por defecto (ES6)</span>
+<span class="kw">function</span> <span class="fn">saludar</span>(nombre = <span class="str">"Estudiante"</span>) {
+  <span class="kw">return</span> <span class="str">`Hola, ${nombre}`</span>;
+}
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">saludar</span>(<span class="str">"Ana"</span>));        <span class="cmt">// → "Hola, Ana"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">saludar</span>());             <span class="cmt">// → "Hola, Estudiante"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">saludar</span>(<span class="kw">undefined</span>));   <span class="cmt">// → "Hola, Estudiante" (undefined activa el default)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">saludar</span>(<span class="kw">null</span>));        <span class="cmt">// → "Hola, null"  (null NO activa el default)</span>
+
+<span class="cmt">// Múltiples parámetros con default — algunos opcionales</span>
+<span class="kw">function</span> <span class="fn">crearUsuario</span>(nombre, rol = <span class="str">"estudiante"</span>, activo = <span class="kw">true</span>) {
+  <span class="kw">return</span> { nombre, rol, activo };
+}
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">crearUsuario</span>(<span class="str">"Carlos"</span>));
+<span class="cmt">// → { nombre: "Carlos", rol: "estudiante", activo: true }</span>
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">crearUsuario</span>(<span class="str">"Ing. Toro"</span>, <span class="str">"docente"</span>));
+<span class="cmt">// → { nombre: "Ing. Toro", rol: "docente", activo: true }</span>
+
+<span class="cmt">// El default puede usar parámetros anteriores</span>
+<span class="kw">function</span> <span class="fn">rango</span>(inicio, fin = inicio * <span class="num">2</span>) {
+  <span class="kw">return</span> <span class="str">`${inicio} → ${fin}`</span>;
+}
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">rango</span>(<span class="num">5</span>));             <span class="cmt">// → "5 → 10"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">rango</span>(<span class="num">5</span>, <span class="num">20</span>));         <span class="cmt">// → "5 → 20"</span></pre>
+    </div>
+
+    <div class="section-title">Rest Parameters — Cantidad Variable de Argumentos</div>
+    <div class="prose">
+      <p>El operador <code>...</code> como <em>rest</em> agrupa todos los argumentos restantes en un <strong>array real</strong>. Debe ser siempre el último parámetro. Reemplaza el antiguo objeto <code>arguments</code> con una solución más clara y funcional.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Rest parameters</span>
+      </div>
+      <pre><span class="cmt">// Sumar cualquier cantidad de números</span>
+<span class="kw">function</span> <span class="fn">sumar</span>(...numeros) {
+  <span class="kw">let</span> total = <span class="num">0</span>;
+  <span class="kw">for</span> (<span class="kw">const</span> n <span class="kw">of</span> numeros) total += n;
+  <span class="kw">return</span> total;
+}
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">sumar</span>(<span class="num">1</span>, <span class="num">2</span>));              <span class="cmt">// → 3</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">sumar</span>(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>));    <span class="cmt">// → 15</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">sumar</span>(<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>));       <span class="cmt">// → 60</span>
+
+<span class="cmt">// Mezclar parámetros normales con rest</span>
+<span class="kw">function</span> <span class="fn">registrarNotas</span>(estudiante, ...notas) {
+  <span class="kw">const</span> promedio = notas.<span class="fn">reduce</span>((acc, n) => acc + n, <span class="num">0</span>) / notas.length;
+  <span class="kw">return</span> <span class="str">`${estudiante}: promedio ${promedio.<span class="fn">toFixed</span>(<span class="num">1</span>)}`</span>;
+}
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">registrarNotas</span>(<span class="str">"Ana"</span>, <span class="num">80</span>, <span class="num">90</span>, <span class="num">75</span>, <span class="num">85</span>));
+<span class="cmt">// → "Ana: promedio 82.5"</span>
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">registrarNotas</span>(<span class="str">"Carlos"</span>, <span class="num">70</span>, <span class="num">65</span>));
+<span class="cmt">// → "Carlos: promedio 67.5"</span></pre>
+    </div>
+
+    <div class="section-title">Spread Operator — Expandir Arrays como Argumentos</div>
+    <div class="prose">
+      <p>El mismo operador <code>...</code> como <em>spread</em> hace lo inverso: <strong>expande</strong> un array en argumentos individuales. Es muy útil para pasar arrays a funciones que esperan valores separados.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Spread como argumentos</span>
+      </div>
+      <pre><span class="kw">const</span> notas = [<span class="num">75</span>, <span class="num">88</span>, <span class="num">92</span>, <span class="num">60</span>, <span class="num">45</span>];
+
+<span class="cmt">// Math.max/min no acepta arrays — spread los expande</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="pp">Math</span>.<span class="fn">max</span>(...notas));         <span class="cmt">// → 92</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="pp">Math</span>.<span class="fn">min</span>(...notas));         <span class="cmt">// → 45</span>
+
+<span class="cmt">// Pasar array a función con rest</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">sumar</span>(...notas));             <span class="cmt">// → 360  (spread + rest)</span>
+
+<span class="cmt">// Combinar arrays</span>
+<span class="kw">const</span> grupo1 = [<span class="str">"Ana"</span>, <span class="str">"Carlos"</span>];
+<span class="kw">const</span> grupo2 = [<span class="str">"María"</span>, <span class="str">"Pedro"</span>];
+<span class="kw">const</span> todos  = [...grupo1, ...grupo2, <span class="str">"Laura"</span>];
+<span class="pp">console</span>.<span class="fn">log</span>(todos);
+<span class="cmt">// → ["Ana", "Carlos", "María", "Pedro", "Laura"]</span>
+
+<span class="cmt">// Clonar un array (copia superficial)</span>
+<span class="kw">const</span> original = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>];
+<span class="kw">const</span> copia    = [...original];
+copia.<span class="fn">push</span>(<span class="num">4</span>);
+<span class="pp">console</span>.<span class="fn">log</span>(original);               <span class="cmt">// → [1, 2, 3]  (no se modificó)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(copia);                  <span class="cmt">// → [1, 2, 3, 4]</span></pre>
+    </div>
+
+    <div class="section-title">Destructuring en Parámetros</div>
+    <div class="prose">
+      <p>En lugar de recibir un objeto completo y acceder a cada propiedad dentro de la función, puedes <strong>desestructurar directamente en la firma</strong>. Esto hace el contrato de la función más explícito.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Destructuring en parámetros</span>
+      </div>
+      <pre><span class="cmt">// Sin destructuring</span>
+<span class="kw">function</span> <span class="fn">presentarMal</span>(estudiante) {
+  <span class="kw">return</span> <span class="str">`${estudiante.nombre}, ${estudiante.carrera}`</span>;
+}
+
+<span class="cmt">// Con destructuring en el parámetro</span>
+<span class="kw">function</span> <span class="fn">presentar</span>({ nombre, carrera, promedio = <span class="str">"N/D"</span> }) {
+  <span class="kw">return</span> <span class="str">`${nombre} | ${carrera} | Promedio: ${promedio}`</span>;
+}
+
+<span class="kw">const</span> alumno = { nombre: <span class="str">"Ana"</span>, carrera: <span class="str">"Sistemas"</span>, promedio: <span class="num">88</span> };
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">presentar</span>(alumno));
+<span class="cmt">// → "Ana | Sistemas | Promedio: 88"</span>
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">presentar</span>({ nombre: <span class="str">"Luis"</span>, carrera: <span class="str">"Civil"</span> }));
+<span class="cmt">// → "Luis | Civil | Promedio: N/D"  (usa default)</span>
+
+<span class="cmt">// Destructuring de array en parámetros</span>
+<span class="kw">function</span> <span class="fn">primeroYUltimo</span>([primero, ...resto]) {
+  <span class="kw">return</span> { primero, ultimo: resto[resto.length - <span class="num">1</span>] };
+}
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">primeroYUltimo</span>([<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>]));
+<span class="cmt">// → { primero: 10, ultimo: 40 }</span></pre>
+    </div>
+
+    <div class="section-title">Comparativa Rápida</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Característica</th><th>Sintaxis</th><th>Propósito</th></tr></thead>
+        <tbody>
+          <tr><td>Default param</td><td><code>fn(x = 0)</code></td><td>Valor cuando no se pasa argumento</td></tr>
+          <tr><td>Rest param</td><td><code>fn(...args)</code></td><td>Agrupar args extra en un array</td></tr>
+          <tr><td>Spread (arg)</td><td><code>fn(...arr)</code></td><td>Expandir array como args separados</td></tr>
+          <tr><td>Destructuring param</td><td><code>fn({ a, b })</code></td><td>Extraer propiedades directamente</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="activity">
+      <div class="activity-label">Ejercicio</div>
+      <h4>Implementa las siguientes funciones:</h4>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+          <span class="code-block-lang">JavaScript</span>
+        </div>
+        <pre><span class="cmt">// 1. Función que recibe cualquier cantidad de strings
+//    y devuelve todos concatenados con un separador (default: " ")
+//    unir("Hola", "mundo")        → "Hola mundo"
+//    unir("a","b","c", " | ")     → "a | b | c"</span>
+<span class="kw">function</span> <span class="fn">unir</span>(...args) { <span class="cmt">/* tu código */</span> }
+
+<span class="cmt">// 2. Función que recibe un objeto producto { nombre, precio, descuento }
+//    con descuento=0 por default, y devuelve el precio final
+//    precioFinal({ nombre:"Libro", precio:150, descuento:10 }) → 135</span>
+<span class="kw">function</span> <span class="fn">precioFinal</span>({ nombre, precio, descuento = <span class="num">0</span> }) {
+  <span class="cmt">/* tu código */</span>
+}
+
+<span class="cmt">// 3. Función que recibe varios arrays y devuelve uno combinado
+//    combinar([1,2], [3,4], [5,6]) → [1, 2, 3, 4, 5, 6]</span>
+<span class="kw">function</span> <span class="fn">combinar</span>(...arrays) { <span class="cmt">/* tu código */</span> }</pre>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════
+       CLASE 9 — Anónimas y Arrow
+  ══════════════════════════════════════ -->
+  <section class="class-section" id="clase9">
+    <div class="class-header">
+      <div class="class-badge">
+        <span class="class-badge-label">Clase</span>
+        <span class="class-badge-num">9</span>
+      </div>
+      <div>
+        <div class="class-title">Funciones Anónimas y Arrow Functions</div>
+        <div class="class-title-sub">Expresiones · Callbacks · Arrow functions · Retorno implícito</div>
+      </div>
+    </div>
+
+    <div class="objectives">
+      <div class="objectives-label">Objetivos</div>
+      <ul>
+        <li>Distinguir funciones declaradas de funciones expresadas y anónimas.</li>
+        <li>Usar funciones como valores (pasarlas como argumentos — callbacks).</li>
+        <li>Escribir arrow functions con retorno explícito e implícito.</li>
+        <li>Identificar las diferencias clave entre <code>function</code> y <code>=&gt;</code>.</li>
+      </ul>
+    </div>
+
+    <div class="section-title">Función Expresada (Function Expression)</div>
+    <div class="prose">
+      <p>Una función expresada se asigna a una variable. A diferencia de la función declarada, <strong>no se eleva (hoisting)</strong> y vive en la variable desde el punto de asignación.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Function expression</span>
+      </div>
+      <pre><span class="cmt">// La función es un valor — se guarda en una const</span>
+<span class="kw">const</span> <span class="fn">doblar</span> = <span class="kw">function</span>(n) {
+  <span class="kw">return</span> n * <span class="num">2</span>;
+};
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">doblar</span>(<span class="num">7</span>));         <span class="cmt">// → 14</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="kw">typeof</span> <span class="fn">doblar</span>);     <span class="cmt">// → "function"</span>
+
+<span class="cmt">// Las funciones se pueden guardar en arrays o pasar como argumentos</span>
+<span class="kw">const</span> operaciones = [
+  <span class="kw">function</span>(n) { <span class="kw">return</span> n + <span class="num">1</span>; },
+  <span class="kw">function</span>(n) { <span class="kw">return</span> n * <span class="num">2</span>; },
+  <span class="kw">function</span>(n) { <span class="kw">return</span> n ** <span class="num">2</span>; },
+];
+
+<span class="kw">for</span> (<span class="kw">const</span> op <span class="kw">of</span> operaciones) {
+  <span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">op</span>(<span class="num">5</span>));
+}
+<span class="cmt">// → 6   10   25</span></pre>
+    </div>
+
+    <div class="section-title">Funciones como Argumentos — Callbacks</div>
+    <div class="prose">
+      <p>En JavaScript las funciones son <strong>ciudadanos de primera clase</strong>: se pueden pasar como argumentos, retornar desde otras funciones y almacenar en variables. Una función pasada como argumento se llama <strong>callback</strong>.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Callbacks</span>
+      </div>
+      <pre><span class="cmt">// operar recibe dos números y UNA FUNCIÓN que decide qué hacer con ellos</span>
+<span class="kw">function</span> <span class="fn">operar</span>(a, b, operacion) {
+  <span class="kw">return</span> <span class="fn">operacion</span>(a, b);
+}
+
+<span class="kw">function</span> <span class="fn">sumar</span>(x, y)    { <span class="kw">return</span> x + y; }
+<span class="kw">function</span> <span class="fn">multiplicar</span>(x, y) { <span class="kw">return</span> x * y; }
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">operar</span>(<span class="num">4</span>, <span class="num">5</span>, sumar));        <span class="cmt">// → 9</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">operar</span>(<span class="num">4</span>, <span class="num">5</span>, multiplicar));  <span class="cmt">// → 20</span>
+
+<span class="cmt">// Pasar función anónima directamente (inline)</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">operar</span>(<span class="num">10</span>, <span class="num">3</span>, <span class="kw">function</span>(x, y) {
+  <span class="kw">return</span> x - y;
+}));  <span class="cmt">// → 7</span>
+
+<span class="cmt">// setTimeout — ejemplo real de callback</span>
+<span class="fn">setTimeout</span>(<span class="kw">function</span>() {
+  <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"Esto aparece después de 1 segundo"</span>);
+}, <span class="num">1000</span>);</pre>
+    </div>
+
+    <div class="section-title">Arrow Functions (ES6)</div>
+    <div class="prose">
+      <p>Las <strong>arrow functions</strong> son una sintaxis compacta para funciones. Más allá de la brevedad, tienen diferencias semánticas importantes: no tienen su propio <code>this</code>, no pueden ser usadas como constructores, y no tienen el objeto <code>arguments</code>.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Evolución hacia arrow function</span>
+      </div>
+      <pre><span class="cmt">// 1. Función declarada clásica</span>
+<span class="kw">function</span> <span class="fn">doblar1</span>(n) {
+  <span class="kw">return</span> n * <span class="num">2</span>;
+}
+
+<span class="cmt">// 2. Función expresada (anónima)</span>
+<span class="kw">const</span> <span class="fn">doblar2</span> = <span class="kw">function</span>(n) {
+  <span class="kw">return</span> n * <span class="num">2</span>;
+};
+
+<span class="cmt">// 3. Arrow function — con bloque y return explícito</span>
+<span class="kw">const</span> <span class="fn">doblar3</span> = (n) =&gt; {
+  <span class="kw">return</span> n * <span class="num">2</span>;
+};
+
+<span class="cmt">// 4. Arrow function — retorno implícito (sin llaves, sin return)</span>
+<span class="kw">const</span> <span class="fn">doblar4</span> = n =&gt; n * <span class="num">2</span>;   <span class="cmt">// un parámetro: sin paréntesis</span>
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">doblar4</span>(<span class="num">9</span>));         <span class="cmt">// → 18</span>
+
+<span class="cmt">// Sin parámetros → paréntesis vacíos obligatorios</span>
+<span class="kw">const</span> <span class="fn">saludar</span> = () =&gt; <span class="str">"¡Hola Mundo!"</span>;
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">saludar</span>());           <span class="cmt">// → "¡Hola Mundo!"</span>
+
+<span class="cmt">// Dos o más parámetros → paréntesis requeridos</span>
+<span class="kw">const</span> <span class="fn">sumar</span>  = (a, b) =&gt; a + b;
+<span class="kw">const</span> <span class="fn">maximo</span> = (a, b) =&gt; a &gt; b ? a : b;
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">sumar</span>(<span class="num">3</span>, <span class="num">4</span>));         <span class="cmt">// → 7</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">maximo</span>(<span class="num">10</span>, <span class="num">7</span>));       <span class="cmt">// → 10</span>
+
+<span class="cmt">// Retorno implícito de objeto — envolver en paréntesis</span>
+<span class="kw">const</span> <span class="fn">crearPunto</span> = (x, y) =&gt; ({ x, y });
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">crearPunto</span>(<span class="num">3</span>, <span class="num">5</span>));   <span class="cmt">// → { x: 3, y: 5 }</span></pre>
+    </div>
+
+    <div class="subsection-title">Arrow functions como callbacks — forma más común</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Arrows como callbacks</span>
+      </div>
+      <pre><span class="kw">function</span> <span class="fn">operar</span>(a, b, fn) { <span class="kw">return</span> <span class="fn">fn</span>(a, b); }
+
+<span class="cmt">// Con function anónima</span>
+<span class="fn">operar</span>(<span class="num">6</span>, <span class="num">2</span>, <span class="kw">function</span>(x, y) { <span class="kw">return</span> x / y; }); <span class="cmt">// → 3</span>
+
+<span class="cmt">// Con arrow function — más conciso</span>
+<span class="fn">operar</span>(<span class="num">6</span>, <span class="num">2</span>, (x, y) =&gt; x / y);                  <span class="cmt">// → 3</span>
+
+<span class="cmt">// setTimeout con arrow</span>
+<span class="fn">setTimeout</span>(() =&gt; <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">"1 segundo"</span>), <span class="num">1000</span>);
+
+<span class="cmt">// forEach — recorrer array con callback</span>
+<span class="kw">const</span> notas = [<span class="num">75</span>, <span class="num">88</span>, <span class="num">92</span>];
+notas.<span class="fn">forEach</span>(nota =&gt; <span class="pp">console</span>.<span class="fn">log</span>(<span class="str">`Nota: ${nota}`</span>));
+<span class="cmt">// → Nota: 75   Nota: 88   Nota: 92</span></pre>
+    </div>
+
+    <div class="section-title">Comparativa: function vs arrow</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Aspecto</th><th><code>function</code></th><th><code>() =&gt; {}</code></th></tr></thead>
+        <tbody>
+          <tr><td>Hoisting</td><td>Sí (completo)</td><td>No</td></tr>
+          <tr><td>Propio <code>this</code></td><td>Sí — dinámico</td><td>No — hereda del scope exterior</td></tr>
+          <tr><td>Objeto <code>arguments</code></td><td>Sí</td><td>No (usar rest <code>...args</code>)</td></tr>
+          <tr><td>Uso como constructor</td><td>Sí (<code>new fn()</code>)</td><td>No — lanza TypeError</td></tr>
+          <tr><td>Retorno implícito</td><td>No</td><td>Sí (sin llaves)</td></tr>
+          <tr><td>Mejor para</td><td>Funciones nombradas, métodos de clase</td><td>Callbacks, funciones cortas, funcional</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="activity">
+      <div class="activity-label">Ejercicio</div>
+      <h4>Reescribe con arrow functions de retorno implícito:</h4>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+          <span class="code-block-lang">JavaScript</span>
+        </div>
+        <pre><span class="cmt">// Reescribe cada función como const con arrow function</span>
+
+<span class="kw">function</span> <span class="fn">cuadrado</span>(n) { <span class="kw">return</span> n * n; }
+
+<span class="kw">function</span> <span class="fn">esPar</span>(n) { <span class="kw">return</span> n % <span class="num">2</span> === <span class="num">0</span>; }
+
+<span class="kw">function</span> <span class="fn">saludo</span>(nombre, hora) {
+  <span class="kw">return</span> hora &lt; <span class="num">12</span> ? <span class="str">`Buenos días, ${nombre}`</span> : <span class="str">`Buenas tardes, ${nombre}`</span>;
+}
+
+<span class="kw">function</span> <span class="fn">aObjeto</span>(nombre, nota) { <span class="kw">return</span> { nombre, nota }; }
+
+<span class="cmt">// Luego crea una función de orden superior 'aplicar(valor, fn)'
+// que recibe un valor y una función, y devuelve fn(valor)
+// Pruébala con cuadrado y esPar</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════
+       CLASE 10 — Closures y Scope
+  ══════════════════════════════════════ -->
+  <section class="class-section" id="clase10">
+    <div class="class-header">
+      <div class="class-badge">
+        <span class="class-badge-label">Clase</span>
+        <span class="class-badge-num">10</span>
+      </div>
+      <div>
+        <div class="class-title">Closures y Scope de Funciones</div>
+        <div class="class-title-sub">Scope léxico · Closure · Fábrica de funciones · Estado privado</div>
+      </div>
+    </div>
+
+    <div class="objectives">
+      <div class="objectives-label">Objetivos</div>
+      <ul>
+        <li>Comprender el scope léxico y la cadena de alcance en JavaScript.</li>
+        <li>Entender qué es un closure y por qué importa en el paradigma funcional.</li>
+        <li>Usar closures para crear estado privado y fábricas de funciones.</li>
+      </ul>
+    </div>
+
+    <div class="section-title">Scope Léxico — Las Funciones Recuerdan su Entorno</div>
+    <div class="prose">
+      <p>En JavaScript, el scope de una variable se determina por <strong>dónde está escrita</strong> en el código fuente, no por dónde se llama. Una función tiene acceso a todas las variables del scope donde fue <em>definida</em>, incluyendo los scopes externos que la rodean — esto forma la <strong>cadena de scope</strong>.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Cadena de scope</span>
+      </div>
+      <pre><span class="kw">const</span> global = <span class="str">"soy global"</span>;
+
+<span class="kw">function</span> <span class="fn">exterior</span>() {
+  <span class="kw">const</span> enExterior = <span class="str">"soy exterior"</span>;
+
+  <span class="kw">function</span> <span class="fn">interior</span>() {
+    <span class="kw">const</span> enInterior = <span class="str">"soy interior"</span>;
+
+    <span class="cmt">// interior VE todo: su scope + exterior + global</span>
+    <span class="pp">console</span>.<span class="fn">log</span>(enInterior);  <span class="cmt">// ✓ propio</span>
+    <span class="pp">console</span>.<span class="fn">log</span>(enExterior);  <span class="cmt">// ✓ scope padre</span>
+    <span class="pp">console</span>.<span class="fn">log</span>(global);      <span class="cmt">// ✓ scope global</span>
+  }
+
+  <span class="fn">interior</span>();
+  <span class="cmt">// console.log(enInterior);  // ✗ ReferenceError — exterior no ve hacia dentro</span>
+}
+
+<span class="fn">exterior</span>();</pre>
+    </div>
+
+    <div class="section-title">¿Qué es un Closure?</div>
+    <div class="prose">
+      <p>Un <strong>closure</strong> ocurre cuando una función interna mantiene acceso a las variables de su scope externo <strong>incluso después de que la función externa ya terminó de ejecutarse</strong>. JavaScript "cierra sobre" el entorno de la función exterior, preservándolo en memoria.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Primer closure</span>
+      </div>
+      <pre><span class="kw">function</span> <span class="fn">crearSaludo</span>(saludo) {
+  <span class="cmt">// Devuelve una función — crearSaludo ya terminó,</span>
+  <span class="cmt">// pero la función interna recuerda "saludo"</span>
+  <span class="kw">return</span> <span class="kw">function</span>(nombre) {
+    <span class="kw">return</span> <span class="str">`${saludo}, ${nombre}!`</span>;
+  };
+}
+
+<span class="kw">const</span> hola    = <span class="fn">crearSaludo</span>(<span class="str">"Hola"</span>);
+<span class="kw">const</span> buenos  = <span class="fn">crearSaludo</span>(<span class="str">"Buenos días"</span>);
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">hola</span>(<span class="str">"Ana"</span>));      <span class="cmt">// → "Hola, Ana!"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">hola</span>(<span class="str">"Carlos"</span>));  <span class="cmt">// → "Hola, Carlos!"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">buenos</span>(<span class="str">"Toro"</span>));  <span class="cmt">// → "Buenos días, Toro!"</span>
+
+<span class="cmt">// Cada closure tiene su propio "saludo" guardado</span></pre>
+    </div>
+
+    <div class="section-title">Estado Privado con Closures</div>
+    <div class="prose">
+      <p>Los closures permiten crear <strong>variables privadas</strong>: accesibles solo a través de las funciones expuestas, inaccesibles desde fuera. Esto es fundamental en el paradigma funcional para evitar estado mutable global.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Contador con estado privado</span>
+      </div>
+      <pre><span class="kw">function</span> <span class="fn">crearContador</span>(inicio = <span class="num">0</span>) {
+  <span class="kw">let</span> cuenta = inicio;  <span class="cmt">// ← variable privada — nadie accede desde fuera</span>
+
+  <span class="kw">return</span> {
+    incrementar: () =&gt; ++cuenta,
+    decrementar: () =&gt; --cuenta,
+    reiniciar:   () =&gt; { cuenta = inicio; },
+    valor:       () =&gt; cuenta,
+  };
+}
+
+<span class="kw">const</span> c1 = <span class="fn">crearContador</span>();
+<span class="kw">const</span> c2 = <span class="fn">crearContador</span>(<span class="num">100</span>);
+
+c1.<span class="fn">incrementar</span>(); c1.<span class="fn">incrementar</span>(); c1.<span class="fn">incrementar</span>();
+<span class="pp">console</span>.<span class="fn">log</span>(c1.<span class="fn">valor</span>());  <span class="cmt">// → 3</span>
+
+c2.<span class="fn">decrementar</span>();
+<span class="pp">console</span>.<span class="fn">log</span>(c2.<span class="fn">valor</span>());  <span class="cmt">// → 99</span>
+
+<span class="cmt">// Los contadores son independientes — cada closure tiene su propia "cuenta"</span>
+<span class="pp">console</span>.<span class="fn">log</span>(c1.<span class="fn">valor</span>());  <span class="cmt">// → 3  (no afectado por c2)</span></pre>
+    </div>
+
+    <div class="section-title">Fábrica de Funciones</div>
+    <div class="prose">
+      <p>Una <strong>fábrica de funciones</strong> (function factory) es una función que devuelve funciones especializadas. Es un patrón central del paradigma funcional: en lugar de repetir código, se generan versiones configuradas de una función base.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Fábricas de funciones</span>
+      </div>
+      <pre><span class="cmt">// Fábrica de multiplicadores</span>
+<span class="kw">const</span> <span class="fn">multiplicadorDe</span> = factor =&gt; n =&gt; n * factor;
+
+<span class="kw">const</span> doble    = <span class="fn">multiplicadorDe</span>(<span class="num">2</span>);
+<span class="kw">const</span> triple   = <span class="fn">multiplicadorDe</span>(<span class="num">3</span>);
+<span class="kw">const</span> decuplo  = <span class="fn">multiplicadorDe</span>(<span class="num">10</span>);
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">doble</span>(<span class="num">5</span>));     <span class="cmt">// → 10</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">triple</span>(<span class="num">5</span>));    <span class="cmt">// → 15</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">decuplo</span>(<span class="num">5</span>));   <span class="cmt">// → 50</span>
+
+<span class="cmt">// Fábrica de validadores</span>
+<span class="kw">const</span> <span class="fn">mayorQue</span> = min =&gt; n =&gt; n &gt; min;
+<span class="kw">const</span> <span class="fn">menorQue</span> = max =&gt; n =&gt; n &lt; max;
+
+<span class="kw">const</span> esMayorDe18   = <span class="fn">mayorQue</span>(<span class="num">18</span>);
+<span class="kw">const</span> esMenorDe100  = <span class="fn">menorQue</span>(<span class="num">100</span>);
+
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">esMayorDe18</span>(<span class="num">20</span>));   <span class="cmt">// → true</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">esMayorDe18</span>(<span class="num">15</span>));   <span class="cmt">// → false</span>
+<span class="pp">console</span>.<span class="fn">log</span>(<span class="fn">esMenorDe100</span>(<span class="num">50</span>));  <span class="cmt">// → true</span>
+
+<span class="cmt">// Aplicación: filtrar con validadores generados</span>
+<span class="kw">const</span> edades = [<span class="num">12</span>, <span class="num">25</span>, <span class="num">17</span>, <span class="num">30</span>, <span class="num">15</span>, <span class="num">22</span>];
+<span class="kw">const</span> mayores = edades.<span class="fn">filter</span>(<span class="fn">esMayorDe18</span>);
+<span class="pp">console</span>.<span class="fn">log</span>(mayores);            <span class="cmt">// → [25, 30, 22]</span></pre>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-label">Closures en el día a día</div>
+      Cada vez que usas <code>setTimeout</code>, <code>addEventListener</code>, <code>fetch().then()</code> o cualquier callback asíncrono en JavaScript, estás usando closures. La función callback recuerda las variables del scope donde fue creada, aunque se ejecute mucho después.
+    </div>
+
+    <div class="activity">
+      <div class="activity-label">Ejercicio</div>
+      <h4>Crea los siguientes closures:</h4>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+          <span class="code-block-lang">JavaScript</span>
+        </div>
+        <pre><span class="cmt">// 1. crearAcumulador(inicio) — devuelve una función que cada vez
+//    que se llama con un número, lo SUMA al acumulador y retorna el total
+//    const acc = crearAcumulador(0)
+//    acc(10) → 10  |  acc(5) → 15  |  acc(20) → 35</span>
+
+<span class="cmt">// 2. crearSufijo(sufijo) — fábrica que agrega un sufijo a cualquier string
+//    const conHn = crearSufijo(" (HN)")
+//    conHn("Tegucigalpa") → "Tegucigalpa (HN)"
+//    conHn("San Pedro Sula") → "San Pedro Sula (HN)"</span>
+
+<span class="cmt">// 3. crearRangos(min, max) — devuelve un objeto con dos funciones:
+//    estaEnRango(n): true si min &lt;= n &lt;= max
+//    aleatorio(): número entero aleatorio entre min y max</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════
+       CLASE 11 — map · filter · reduce
+  ══════════════════════════════════════ -->
+  <section class="class-section" id="clase11">
+    <div class="class-header">
+      <div class="class-badge">
+        <span class="class-badge-label">Clase</span>
+        <span class="class-badge-num">11</span>
+      </div>
+      <div>
+        <div class="class-title">map · filter · reduce</div>
+        <div class="class-title-sub">Funciones de orden superior · Programación declarativa · Encadenamiento</div>
+      </div>
+    </div>
+
+    <div class="objectives">
+      <div class="objectives-label">Objetivos</div>
+      <ul>
+        <li>Transformar arrays con <code>map</code> sin mutar el original.</li>
+        <li>Filtrar elementos con <code>filter</code> mediante predicados.</li>
+        <li>Reducir arrays a un único valor con <code>reduce</code>.</li>
+        <li>Encadenar las tres funciones para resolver problemas complejos de forma declarativa.</li>
+      </ul>
+    </div>
+
+    <div class="prose">
+      <p>Estas tres funciones son los pilares del paradigma funcional en JavaScript. Todas reciben un <strong>callback</strong> (función) como argumento — son funciones de orden superior. Ninguna modifica el array original: siempre devuelven un nuevo resultado.</p>
+    </div>
+
+    <!-- MAP -->
+    <div class="section-title">map — Transformar Cada Elemento</div>
+    <div class="prose">
+      <p><code>map</code> crea un <strong>nuevo array</strong> aplicando una función a <em>cada</em> elemento del array original. La longitud del resultado siempre es igual a la del original.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — map</span>
+      </div>
+      <pre><span class="cmt">// Sintaxis: array.map(elemento => transformación)</span>
+
+<span class="kw">const</span> numeros = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>];
+
+<span class="cmt">// Doblar cada número</span>
+<span class="kw">const</span> dobles = numeros.<span class="fn">map</span>(n =&gt; n * <span class="num">2</span>);
+<span class="pp">console</span>.<span class="fn">log</span>(dobles);   <span class="cmt">// → [2, 4, 6, 8, 10]</span>
+<span class="pp">console</span>.<span class="fn">log</span>(numeros);  <span class="cmt">// → [1, 2, 3, 4, 5]  (original intacto)</span>
+
+<span class="cmt">// Elevar al cuadrado</span>
+<span class="kw">const</span> cuadrados = numeros.<span class="fn">map</span>(n =&gt; n ** <span class="num">2</span>);
+<span class="pp">console</span>.<span class="fn">log</span>(cuadrados);  <span class="cmt">// → [1, 4, 9, 16, 25]</span>
+
+<span class="cmt">// Strings a mayúsculas</span>
+<span class="kw">const</span> frutas     = [<span class="str">"manzana"</span>, <span class="str">"pera"</span>, <span class="str">"naranja"</span>];
+<span class="kw">const</span> mayusculas = frutas.<span class="fn">map</span>(f =&gt; f.<span class="fn">toUpperCase</span>());
+<span class="pp">console</span>.<span class="fn">log</span>(mayusculas); <span class="cmt">// → ["MANZANA", "PERA", "NARANJA"]</span>
+
+<span class="cmt">// Transformar array de objetos</span>
+<span class="kw">const</span> estudiantes = [
+  { nombre: <span class="str">"Ana"</span>,    nota: <span class="num">85</span> },
+  { nombre: <span class="str">"Carlos"</span>, nota: <span class="num">72</span> },
+  { nombre: <span class="str">"María"</span>,  nota: <span class="num">90</span> },
+];
+
+<span class="kw">const</span> nombres    = estudiantes.<span class="fn">map</span>(e =&gt; e.nombre);
+<span class="pp">console</span>.<span class="fn">log</span>(nombres);       <span class="cmt">// → ["Ana", "Carlos", "María"]</span>
+
+<span class="kw">const</span> conEtiqueta = estudiantes.<span class="fn">map</span>(e =&gt; ({
+  ...e,
+  etiqueta: e.nota &gt;= <span class="num">60</span> ? <span class="str">"Aprobado"</span> : <span class="str">"Reprobado"</span>
+}));
+<span class="pp">console</span>.<span class="fn">log</span>(conEtiqueta);
+<span class="cmt">// → [{ nombre:"Ana", nota:85, etiqueta:"Aprobado" }, ...]</span></pre>
+    </div>
+
+    <!-- FILTER -->
+    <div class="section-title">filter — Seleccionar Elementos</div>
+    <div class="prose">
+      <p><code>filter</code> crea un nuevo array con solo los elementos donde el callback devuelve <code>true</code>. El callback recibe cada elemento y actúa como un <strong>predicado</strong> (función que responde sí/no).</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — filter</span>
+      </div>
+      <pre><span class="kw">const</span> numeros = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>, <span class="num">7</span>, <span class="num">8</span>];
+
+<span class="cmt">// Solo pares</span>
+<span class="kw">const</span> pares = numeros.<span class="fn">filter</span>(n =&gt; n % <span class="num">2</span> === <span class="num">0</span>);
+<span class="pp">console</span>.<span class="fn">log</span>(pares);       <span class="cmt">// → [2, 4, 6, 8]</span>
+
+<span class="cmt">// Mayores que 5</span>
+<span class="kw">const</span> grandes = numeros.<span class="fn">filter</span>(n =&gt; n &gt; <span class="num">5</span>);
+<span class="pp">console</span>.<span class="fn">log</span>(grandes);     <span class="cmt">// → [6, 7, 8]</span>
+
+<span class="cmt">// Filtrar objetos</span>
+<span class="kw">const</span> estudiantes = [
+  { nombre: <span class="str">"Ana"</span>,    nota: <span class="num">85</span>, activo: <span class="kw">true</span>  },
+  { nombre: <span class="str">"Carlos"</span>, nota: <span class="num">45</span>, activo: <span class="kw">true</span>  },
+  { nombre: <span class="str">"María"</span>,  nota: <span class="num">90</span>, activo: <span class="kw">false</span> },
+  { nombre: <span class="str">"Pedro"</span>,  nota: <span class="num">62</span>, activo: <span class="kw">true</span>  },
+];
+
+<span class="cmt">// Aprobados activos</span>
+<span class="kw">const</span> aprobados = estudiantes.<span class="fn">filter</span>(e =&gt; e.nota &gt;= <span class="num">60</span> &amp;&amp; e.activo);
+<span class="pp">console</span>.<span class="fn">log</span>(aprobados.<span class="fn">map</span>(e =&gt; e.nombre));
+<span class="cmt">// → ["Ana", "Pedro"]</span>
+
+<span class="cmt">// Eliminar duplicados de strings</span>
+<span class="kw">const</span> tags = [<span class="str">"js"</span>, <span class="str">"css"</span>, <span class="str">"js"</span>, <span class="str">"html"</span>, <span class="str">"css"</span>];
+<span class="kw">const</span> unicos = tags.<span class="fn">filter</span>((tag, idx, arr) =&gt; arr.<span class="fn">indexOf</span>(tag) === idx);
+<span class="pp">console</span>.<span class="fn">log</span>(unicos);     <span class="cmt">// → ["js", "css", "html"]</span></pre>
+    </div>
+
+    <!-- REDUCE -->
+    <div class="section-title">reduce — Reducir a un Único Valor</div>
+    <div class="prose">
+      <p><code>reduce</code> es la más poderosa de las tres. Recorre el array acumulando un resultado: el callback recibe el <strong>acumulador</strong> y el <strong>elemento actual</strong>. Con <code>reduce</code> puedes reimplementar <code>map</code> y <code>filter</code>, y resolver casi cualquier transformación.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — reduce</span>
+      </div>
+      <pre><span class="cmt">// Sintaxis: array.reduce((acumulador, elemento) => ..., valorInicial)</span>
+
+<span class="kw">const</span> notas = [<span class="num">80</span>, <span class="num">90</span>, <span class="num">75</span>, <span class="num">85</span>, <span class="num">70</span>];
+
+<span class="cmt">// Suma total</span>
+<span class="kw">const</span> total = notas.<span class="fn">reduce</span>((acc, n) =&gt; acc + n, <span class="num">0</span>);
+<span class="pp">console</span>.<span class="fn">log</span>(total);                 <span class="cmt">// → 400</span>
+
+<span class="cmt">// Promedio</span>
+<span class="kw">const</span> promedio = notas.<span class="fn">reduce</span>((acc, n) =&gt; acc + n, <span class="num">0</span>) / notas.length;
+<span class="pp">console</span>.<span class="fn">log</span>(promedio);              <span class="cmt">// → 80</span>
+
+<span class="cmt">// Máximo con reduce</span>
+<span class="kw">const</span> maximo = notas.<span class="fn">reduce</span>((max, n) =&gt; n &gt; max ? n : max, notas[<span class="num">0</span>]);
+<span class="pp">console</span>.<span class="fn">log</span>(maximo);                <span class="cmt">// → 90</span>
+
+<span class="cmt">// Contar aprobados</span>
+<span class="kw">const</span> aprobados = notas.<span class="fn">reduce</span>((acc, n) =&gt; n &gt;= <span class="num">60</span> ? acc + <span class="num">1</span> : acc, <span class="num">0</span>);
+<span class="pp">console</span>.<span class="fn">log</span>(aprobados);             <span class="cmt">// → 5</span>
+
+<span class="cmt">// Agrupar por categoría</span>
+<span class="kw">const</span> estudiantes = [
+  { nombre: <span class="str">"Ana"</span>,    nota: <span class="num">85</span> },
+  { nombre: <span class="str">"Carlos"</span>, nota: <span class="num">45</span> },
+  { nombre: <span class="str">"María"</span>,  nota: <span class="num">92</span> },
+  { nombre: <span class="str">"Pedro"</span>,  nota: <span class="num">55</span> },
+];
+
+<span class="kw">const</span> agrupados = estudiantes.<span class="fn">reduce</span>((grupos, e) =&gt; {
+  <span class="kw">const</span> clave = e.nota &gt;= <span class="num">60</span> ? <span class="str">"aprobados"</span> : <span class="str">"reprobados"</span>;
+  grupos[clave].<span class="fn">push</span>(e.nombre);
+  <span class="kw">return</span> grupos;
+}, { aprobados: [], reprobados: [] });
+
+<span class="pp">console</span>.<span class="fn">log</span>(agrupados);
+<span class="cmt">// → { aprobados: ["Ana","María"], reprobados: ["Carlos","Pedro"] }</span></pre>
+    </div>
+
+    <div class="section-title">Encadenamiento — map + filter + reduce</div>
+    <div class="prose">
+      <p>La verdadera potencia aparece al <strong>encadenar</strong> las tres funciones. Cada una recibe el resultado de la anterior, creando un flujo de transformaciones declarativo y legible.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Encadenamiento</span>
+      </div>
+      <pre><span class="kw">const</span> estudiantes = [
+  { nombre: <span class="str">"Ana"</span>,    nota: <span class="num">85</span>, activo: <span class="kw">true</span>  },
+  { nombre: <span class="str">"Carlos"</span>, nota: <span class="num">45</span>, activo: <span class="kw">true</span>  },
+  { nombre: <span class="str">"María"</span>,  nota: <span class="num">90</span>, activo: <span class="kw">false</span> },
+  { nombre: <span class="str">"Pedro"</span>,  nota: <span class="num">72</span>, activo: <span class="kw">true</span>  },
+  { nombre: <span class="str">"Laura"</span>,  nota: <span class="num">55</span>, activo: <span class="kw">true</span>  },
+];
+
+<span class="cmt">// Promedio de notas de estudiantes ACTIVOS que APROBARON</span>
+<span class="kw">const</span> promedioAprobadosActivos = estudiantes
+  .<span class="fn">filter</span>(e =&gt; e.activo)             <span class="cmt">// solo activos: Ana, Carlos, Pedro, Laura</span>
+  .<span class="fn">filter</span>(e =&gt; e.nota &gt;= <span class="num">60</span>)         <span class="cmt">// solo aprobados: Ana, Pedro</span>
+  .<span class="fn">map</span>(e =&gt; e.nota)                   <span class="cmt">// extraer notas: [85, 72]</span>
+  .<span class="fn">reduce</span>((acc, n, _, arr) =&gt;          <span class="cmt">// sumar y promediar</span>
+    acc + n / arr.length, <span class="num">0</span>
+  );
+
+<span class="pp">console</span>.<span class="fn">log</span>(promedioAprobadosActivos);  <span class="cmt">// → 78.5</span>
+
+<span class="cmt">// Lista de nombres en mayúsculas de los reprobados activos</span>
+<span class="kw">const</span> reprobadosLista = estudiantes
+  .<span class="fn">filter</span>(e =&gt; e.activo &amp;&amp; e.nota &lt; <span class="num">60</span>)
+  .<span class="fn">map</span>(e =&gt; e.nombre.<span class="fn">toUpperCase</span>())
+  .<span class="fn">reduce</span>((acc, n) =&gt; acc + (acc ? <span class="str">", "</span> : <span class="str">""</span>) + n, <span class="str">""</span>);
+
+<span class="pp">console</span>.<span class="fn">log</span>(reprobadosLista);           <span class="cmt">// → "CARLOS, LAURA"</span></pre>
+    </div>
+
+    <div class="section-title">Comparativa: imperativo vs declarativo</div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+        <span class="code-block-lang">JavaScript — Estilo imperativo vs funcional</span>
+      </div>
+      <pre><span class="kw">const</span> notas = [<span class="num">80</span>, <span class="num">45</span>, <span class="num">90</span>, <span class="num">55</span>, <span class="num">72</span>];
+
+<span class="cmt">// ✗ Imperativo — describe CÓMO hacerlo (bucles, estado mutable)</span>
+<span class="kw">let</span> sumaImperativa = <span class="num">0</span>;
+<span class="kw">let</span> conteoImperativo = <span class="num">0</span>;
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i &lt; notas.length; i++) {
+  <span class="kw">if</span> (notas[i] &gt;= <span class="num">60</span>) {
+    sumaImperativa += notas[i];
+    conteoImperativo++;
+  }
+}
+<span class="kw">const</span> promedioImp = sumaImperativa / conteoImperativo;
+
+<span class="cmt">// ✓ Declarativo/Funcional — describe QUÉ se quiere</span>
+<span class="kw">const</span> aprobadas  = notas.<span class="fn">filter</span>(n =&gt; n &gt;= <span class="num">60</span>);
+<span class="kw">const</span> sumaF      = aprobadas.<span class="fn">reduce</span>((acc, n) =&gt; acc + n, <span class="num">0</span>);
+<span class="kw">const</span> promedioF  = sumaF / aprobadas.length;
+
+<span class="pp">console</span>.<span class="fn">log</span>(promedioImp);    <span class="cmt">// → 80.67</span>
+<span class="pp">console</span>.<span class="fn">log</span>(promedioF);      <span class="cmt">// → 80.67</span></pre>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Función</th><th>Recibe</th><th>Devuelve</th><th>¿Muta el original?</th></tr></thead>
+        <tbody>
+          <tr><td><code>map(fn)</code></td><td>Callback: <code>(elemento) =&gt; nuevoValor</code></td><td>Array de igual longitud</td><td>No</td></tr>
+          <tr><td><code>filter(fn)</code></td><td>Predicado: <code>(elemento) =&gt; boolean</code></td><td>Array de menor o igual longitud</td><td>No</td></tr>
+          <tr><td><code>reduce(fn, init)</code></td><td>Callback: <code>(acc, elemento) =&gt; nuevoAcc</code></td><td>Un único valor (cualquier tipo)</td><td>No</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="activity">
+      <div class="activity-label">Ejercicios finales — Paradigma Funcional</div>
+      <h4>Resuelve usando map, filter y reduce (sin bucles for/while):</h4>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div><div class="code-block-dot"></div><div class="code-block-dot"></div>
+          <span class="code-block-lang">JavaScript</span>
+        </div>
+        <pre><span class="kw">const</span> productos = [
+  { nombre: <span class="str">"Cuaderno"</span>, precio: <span class="num">45</span>,  categoria: <span class="str">"útiles"</span>    },
+  { nombre: <span class="str">"Lapicero"</span>, precio: <span class="num">8</span>,   categoria: <span class="str">"útiles"</span>    },
+  { nombre: <span class="str">"Mochila"</span>,  precio: <span class="num">350</span>, categoria: <span class="str">"accesorios"</span> },
+  { nombre: <span class="str">"Regla"</span>,    precio: <span class="num">15</span>,  categoria: <span class="str">"útiles"</span>    },
+  { nombre: <span class="str">"Tablet"</span>,   precio: <span class="num">2800</span>,categoria: <span class="str">"tecnología"</span> },
+  { nombre: <span class="str">"Borrador"</span>, precio: <span class="num">5</span>,   categoria: <span class="str">"útiles"</span>    },
+];
+
+<span class="cmt">// 1. Lista de nombres de todos los útiles (categoria === "útiles")</span>
+
+<span class="cmt">// 2. Precio total de todos los productos</span>
+
+<span class="cmt">// 3. Precio promedio de los productos de categoría "útiles"</span>
+
+<span class="cmt">// 4. Producto más caro (usar reduce)</span>
+
+<span class="cmt">// 5. Array de objetos { nombre, precioConIVA } — IVA = 15%
+//    redondeado a 2 decimales</span>
+
+<span class="cmt">// 6. Verificar si TODOS los útiles cuestan menos de 100 (usar every)
+//    Pista: [].every(fn) — devuelve true si el predicado es true para todos</span>
+
+<span class="cmt">// 7. Nombres de productos que contienen la letra "o" en su nombre
+//    ordenados alfabéticamente (usar sort después de filter+map)</span></pre>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Bottom navigation -->
+<nav class="bottom-nav">
+  <button class="nav-btn prev" id="prevBtn">&#8592; Anterior</button>
+  <span class="page-counter" id="pageCounter"></span>
+  <button class="nav-btn next" id="nextBtn">Siguiente &#8594;</button>
+</nav>
+
+<script>
+  const sections = Array.from(document.querySelectorAll('.class-section'));
+  const navLinks = Array.from(document.querySelectorAll('.sidebar nav a'));
+  const mainEl   = document.querySelector('.main');
+  const prevBtn  = document.getElementById('prevBtn');
+  const nextBtn  = document.getElementById('nextBtn');
+  const counter  = document.getElementById('pageCounter');
+  let current    = 0;
+
+  function showSection(index) {
+    if (index < 0 || index >= sections.length) return;
+    sections[current].classList.remove('active');
+    navLinks.forEach(a => a.classList.remove('active'));
+    current = index;
+    sections[current].classList.add('active');
+
+    const activeLink = document.querySelector(
+      `.sidebar nav a[href="#${sections[current].id}"]`
+    );
+    if (activeLink) {
+      activeLink.classList.add('active');
+      // Auto-expandir el grupo si está colapsado
+      const parentNav = activeLink.closest('nav');
+      if (parentNav && parentNav.classList.contains('nav-collapsed')) {
+        parentNav.classList.remove('nav-collapsed');
+        const groupLabel = document.querySelector(
+          `[data-target="${parentNav.id}"]`
+        );
+        if (groupLabel) {
+          const ch = groupLabel.querySelector('.chevron');
+          if (ch) ch.style.transform = 'rotate(0deg)';
+        }
+      }
+    }
+
+    mainEl.scrollTo({ top: 0 });
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === sections.length - 1;
+    counter.innerHTML = `Clase <strong>${current + 1}</strong> de ${sections.length}`;
+  }
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const id  = link.getAttribute('href').slice(1);
+      const idx = sections.findIndex(s => s.id === id);
+      if (idx !== -1) showSection(idx);
+    });
+  });
+
+  prevBtn.addEventListener('click', () => showSection(current - 1));
+  nextBtn.addEventListener('click', () => showSection(current + 1));
+
+  // Sidebar colapsable
+  document.querySelectorAll('.sidebar-section-label.collapsible').forEach(label => {
+    label.addEventListener('click', () => {
+      const nav     = document.getElementById(label.dataset.target);
+      const chevron = label.querySelector('.chevron');
+      const isNowCollapsed = nav.classList.toggle('nav-collapsed');
+      chevron.style.transform = isNowCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)';
+    });
+  });
+
+  showSection(0);
+</script>
+
+</body>
+</html>

@@ -33,6 +33,16 @@ Presentación conceptual y teórica del tema central de la unidad:
 | 7 | Comparativa: Python, JavaScript y PHP |
 | 8 | Beneficios del Multiparadigma |
 
+### `javascript.html` — Introducción a JavaScript
+
+Clases prácticas de JavaScript desde los fundamentos hasta el paradigma funcional:
+
+| Clase | Tema |
+|-------|------|
+| 1 | Historia de JavaScript — Brendan Eich, ECMAScript, Node.js |
+| 2 | Variables — var · let · const · Scope · Hoisting |
+| 3 | Tipos de Datos — String · Number · Boolean · Null · Undefined · Array |
+
 ---
 
 ## Tecnologías Utilizadas
@@ -76,6 +86,7 @@ El diseño sigue un estilo editorial clásico con paleta cálida inspirada en pa
 ```
 contenido web/
 ├── index.html          # Introducción a Lenguajes Multiparadigma
+├── javascript.html     # Introducción a JavaScript (Historia, Variables, Tipos de Datos)
 ├── index_example.html  # Plantilla de diseño de referencia
 └── README.md           # Este archivo
 ```
